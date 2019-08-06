@@ -103,13 +103,13 @@
     </section>
 
     <section title="Problem Statement / Operator Use Cases">
-      <t>This document is designed around the following use cases that operators have today, or can foresee coming on the near horizon.</t>
+      <t>This document is designed around the following use cases that operators have today, or can foresee coming on the near horizion.</t>
       <section title="Use Case 1 : Traffic Analytics">
         <t>At present, operators may use a mix of NetFlow, IPFIX, and inline traffic samplers spread throughout the network to gather data for analytics.  With the next generation of hardware on the horizon, we have 400Gb/s interfaces starting to become available, with faster speeds already being talked about.  This will require at least an augmentation of any inline traffic samplers, which are quite expensive.  Additionally, the pace of growth in the data plane is outgrowing the pace of growth in the control plane.  This is especially seen with relatively control plane or CPU heavy protocols like NetFlow, where present sampling rates are simply not going to be sustainable long-term, due to on-box control plane hardware limitations.  Being able to capture a filtered, sampled collection of actual packets throughout the network is very valuable for understanding how the network is being used, to provide hard data to justify network topology augments or changes.</t>
-        <t>This proposal addresses this use case by making the data replication as simple as possible for hardware forwarding ASICs to implement and send off the device.  This allows offloading the heavy calculations to distributed infrastructure than can be scaled as needed using commodity hardware.</t>
+        <t>This proposal addresses this use case by making the data replication as simple as possible for hardware fowarding ASICs to implement and send off the device.  This allows offloading the heavy calculations to distributed infrastructure than can be scaled as needed using commodity hardware.</t>
       </section>
       <section title="Use Case 2 : Network Behavior Verification">
-        <t>This use case focuses on the potential ability to have the ASICs also include packets that would normally be dropped, along with a reason why.  With bits denoting dropped due to QoS policies, buffer contention, ACLs, etc., this traffic could be captured (potentially at a sampling rate of 1:1, i.e. every packet) and sent off for off-box analysis to determine if this was expected, or to provide alerts that QoS policies may be having adverse effects on the network.  Here, including the packet payload provides a lot of additional data for these platforms to effectively "second guess" these policies.</t>
+        <t>This use case focuses on the potential abilioty to have the ASICs also include packets that would normally be dropped, along with a reason why.  With bits denoting dropped due to QoS policies, buffer contention, ACLs, etc., this traffic could be captured (potentially at a sampling rate of 1:1, i.e. every packet) and sent off for off-box analysis to determine if this was expected, or to provide alerts that QoS policies may be having adverse effects on the network.  Here, including the packet payload provides a lot of additional data for these platforms to effectively "second guess" these policies.</t>
         <t>This proposal addresses this use case by explicitly including a field for marking what an ASIC is going to do with a packet, and including the payload of the resulting sample.</t>
       </section>
       <section title="Use Case 3 : Standardization">
@@ -119,7 +119,7 @@
     </section>
     
     <section title="Stream Setup">
-      <t>To begin, a Client utilizes a supported configuration method (NETCONF, RESTCONF, gRPC, etc.) and the YANG model listed in Appendix A.  A Client must first request from the Replicator the available configurations via the 'points' branch, which provides the   following information:<ul>
+      <t>To begin, a Client utilizes NETCONF and the model listed in Appedix A.  A Client must first request from the Replicator the available configurations via the 'points' branch, which provides the   following information:<ul>
         <li><t>A name of the Point.</t></li>
         <li><t>What interfaces this Point is servicing.</t></li>
         <li><t>If filtering is available, and if so, what filters can be applied (against certain IP fields, against parts of the frame, etc.)</t></li>
@@ -127,10 +127,10 @@
         <li><t>Any current samplers already active off this Point.</t></li>
         <li><t>Optionally, the maximum frame length the Point can replicate into the sample.</t></li>
         <li><t>Optionally, the maximum offset into a frame the Point can inspect.</t></li>
-        <li><t>Optionally, the maximum number of samplers that this Point can accommodate.  A Client MUST still check for success, as highly complex filters may reduce the amount of replication the Point can do from this maximum.</t></li>
+        <li><t>Optionally, the maximum number of samplers that this Point can accomodate.  A Client MUST still check for success, as highly complex filters may reduce the amount of replication the Point can do from this maximum.</t></li>
       </ul></t>
       <t>The Client then can request one or more streams to be set up on the Replicator, using that information.</t>
-      <t>These individual streams may be configured with filters and a sampling rate, with the replicated packets sent to the Receiver, wrapped in an outer UDP header.  The available filters are provided by the Replicator in the response above - a common option will be for what interface specifically to filter traffic against.  The source port of this UDP stream MUST be set to TBD1 by default - Replicators MAY offer an ability to change this default.  This is to allow security filters to have a fixed value to key off of as an additional defense to prevent these streams from being inadvertently sent to undesirable locations.</t>
+      <t>These individual streams may be configured with filters and a sampling rate, with the replicated packets sent to the Receiver, wrapped in an outer UDP header.  The available filters are provided by the Replicator in the response above - a common option will be for what interface specifically to filter traffic against.  The source port of this UDP stream MUST be set to TBD1 by default - Replicators MAY offer an ability to change this default.  This is to allow security filters to have a fixed value to key off of as an additional defense to prevent these streams from being inadvertantly sent to undesirable locations.</t>
       <t>The Client and Receiver MAY be separate devices.  The mechanism of exchanging information between Client and Receiver about the setup process is outside the scope of this document.</t>
     </section>
     
@@ -160,7 +160,7 @@
     <ttcol>Type-Data</ttcol>
     <c>Incoming port</c><c>8</c><c>ingress-port</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"></xref>.</c>
     <c>Timestamp</c><c>24</c><c>timestamp-nsec</c><c>Two 32 bit numbers giving when the "0" of this field is based off of.</c>
-    <c>Act</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
+    <c>Action</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
     <c>Frame Length</c><c>17</c><c>frame-length</c><c>Note that this denotes the original frame length - the payload field MAY NOT include the entire payload.</c>
     <c>Internal Data 1</c><c>13</c><c>padding</c><c></c>
     <c>Payload</c><c>0</c><c>frame-payload</c><c></c>
@@ -204,7 +204,7 @@ reference: This document]]></artwork></figure>
     </section>
 
     <section anchor="Security" title="Security Considerations">
-      <t>Vendors and deployments must take into consideration that this functionality allows a mirroring of traffic, with configurable destinations and filters.  Similar functionality already exists in various remote packet mirroring systems, and similar considerations should be taken.  Filters utilizing the source port of TBD1 SHOULD be applied at the edges of a provider's network to provide an additional layer of security.</t>
+      <t>Vendors and deployments must take into consideration that this functionality allows a mirroring of traffic, with configurable destinations and filters.  Similar functionality already exists in various remote packet mirroring systems, and similiar considerations should be taken.  Filters utilizing the source port of TBD1 SHOULD be applied at the edges of a provider's network to provide an additional layer of security.</t>
     </section>
 
   </middle>

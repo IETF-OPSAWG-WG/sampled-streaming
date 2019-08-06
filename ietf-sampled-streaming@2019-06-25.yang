@@ -80,7 +80,7 @@ module ietf-sampled-streaming {
         description "The IPv6 header's destination IPv4 address.";
       }      
       enum frame-size {
-        description "The total size of the frame.";
+        description "The total size of the the frame.";
       }
       enum frame-payload {
         description "Specific payload octets.";
