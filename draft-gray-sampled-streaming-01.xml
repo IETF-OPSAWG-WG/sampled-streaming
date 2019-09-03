@@ -177,6 +177,7 @@
     <li><t>At least two sessions per physical interface</t></li>
     <li><t>Filtering on ingress port</t></li>
     <li><t>Filtering on action</t></li>
+    <li><t>Filtering on direction of traffic</t></li>
     </ul></t>
 
     <t>A Client SHOULD take efforts to be notified when a change has occurred on the Replicator, and re-verify its replication configurations when such a change is detected.</t>

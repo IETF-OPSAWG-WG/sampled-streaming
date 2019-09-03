@@ -43,6 +43,14 @@ module ietf-sampled-streaming {
      described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
      they appear in all capitals, as shown here.";     
 
+
+  revision 2019-08-06 {
+    description 
+      "Updates based on feedback for -01 draft.";
+    reference
+      "draft-gray-sampled-streaming-01";
+  }
+
   revision 2019-06-25 {
     description
       "Initial version.";
@@ -57,6 +65,9 @@ module ietf-sampled-streaming {
       }
       enum action {
         description "Filter against a list of actions that the Point took (i.e., only consider packets that were actually forwarded).";
+      }
+      enum direction {
+        description "Direction to sample traffic in.";
       }
     	enum ip-version {
     	  description "The version number in the IP header.";
@@ -86,7 +97,6 @@ module ietf-sampled-streaming {
         description "Specific payload octets.";
       }
     }
-
     description "The filtering abilities available.";
   }
 
@@ -120,7 +130,6 @@ module ietf-sampled-streaming {
         description "The action that was taken on this frame.  Values are mapped as according to action-type.";
       }
     }
-
     description "Types of data included in the data stream provided back to the receiver.  Note that all fields will not be provided.";
   }
 
@@ -148,7 +157,6 @@ module ietf-sampled-streaming {
         description "Frame was remarked and forwarded.";
       }
     }
-
     description "Possible actions taken on a packet.";
   }
 
@@ -158,8 +166,22 @@ module ietf-sampled-streaming {
         description "Sent with a UDP header.";
       }
     }
-
     description "Different possible destination types.";
+  }
+
+  typedef direction-type {
+    type enumeration {
+      enum ingress {
+        description "Traffic flowing into the Replicator.";
+      }
+      enum egress {
+        description "Traffic flowing out of the Replicator.";
+      }
+      enum both {
+        description "Capture both ingress and egress traffic.";
+      }
+    }
+    description "Different possible direction types.";
   }
     
   list points {
@@ -172,12 +194,12 @@ module ietf-sampled-streaming {
     list interface {
       description "List of interfaces that are available at this point.";
       config false;
-	  	  leaf if {
+	  	leaf if {
         mandatory true;
         type if:interface-ref;
         description "An interface tied to this capture point.";
-		    }
-	    }
+		  }
+	  }
     list filters {
       description "List of filtering options available at this point.";
       config false;
@@ -285,6 +307,16 @@ module ietf-sampled-streaming {
           leaf action {
             description "One specific action code.";
             type action-type;
+          }
+        }
+
+        list directions {
+          when "../type = 'direction'";
+          description "Which direction(s) to sample traffic in.";
+          key "direction";
+          leaf direction {
+            description "Specific direction code.";
+            type direction-type;
           }
         }
 

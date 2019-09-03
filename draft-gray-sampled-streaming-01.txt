@@ -4,8 +4,8 @@
 
 Internet Engineering Task Force                             A. Gray, Ed.
 Internet-Draft                                    Charter Communications
-Intended status: Informational                             6 August 2019
-Expires: 7 February 2020
+Intended status: Informational                          3 September 2019
+Expires: 6 March 2020
 
 
                        Sampled Traffic Streaming
@@ -41,7 +41,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 February 2020.
+   This Internet-Draft will expire on 6 March 2020.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Gray                     Expires 7 February 2020                [Page 1]
+Gray                      Expires 6 March 2020                  [Page 1]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
    license-info) in effect on the date of publication of this document.
@@ -82,7 +82,7 @@ Table of Contents
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
      7.2.  Informative References  . . . . . . . . . . . . . . . . .   8
    Appendix A.  Yang Model . . . . . . . . . . . . . . . . . . . . .   9
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  17
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  18
 
 1.  Introduction
 
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Gray                     Expires 7 February 2020                [Page 2]
+Gray                      Expires 6 March 2020                  [Page 2]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
       interface may be serviced by multiple Points, that may have
@@ -165,9 +165,9 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
 
 
 
-Gray                     Expires 7 February 2020                [Page 3]
+Gray                      Expires 6 March 2020                  [Page 3]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
 2.3.  Use Case 3 : Standardization
@@ -221,9 +221,9 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
 
 
 
-Gray                     Expires 7 February 2020                [Page 4]
+Gray                      Expires 6 March 2020                  [Page 4]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
    The Client then can request one or more streams to be set up on the
@@ -277,9 +277,9 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
 
 
 
-Gray                     Expires 7 February 2020                [Page 5]
+Gray                      Expires 6 March 2020                  [Page 5]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
     0                   1                   2                   3
@@ -333,9 +333,9 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
 
 
 
-Gray                     Expires 7 February 2020                [Page 6]
+Gray                      Expires 6 March 2020                  [Page 6]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
    Client and Replicator, and can have practically any layout, with any
@@ -389,9 +389,9 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
 
 
 
-Gray                     Expires 7 February 2020                [Page 7]
+Gray                      Expires 6 March 2020                  [Page 7]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
    Registry" RFC 3688 [RFC3688].  Following the format in RFC 3688, the
@@ -445,9 +445,9 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
 
 
 
-Gray                     Expires 7 February 2020                [Page 8]
+Gray                      Expires 6 March 2020                  [Page 8]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
 Appendix A.  Yang Model
@@ -501,9 +501,9 @@ Appendix A.  Yang Model
 
 
 
-Gray                     Expires 7 February 2020                [Page 9]
+Gray                      Expires 6 March 2020                  [Page 9]
 
-Internet-Draft          Sampled Traffic Streaming            August 2019
+Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
        description
@@ -519,6 +519,9 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
          }
          enum action {
            description "Filter against a list of actions that the Point took (i.e., only consider packets that were actually forwarded).";
+         }
+         enum direction {
+           description "Direction to sample traffic in.";
          }
            enum ip-version {
              description "The version number in the IP header.";
@@ -552,16 +555,15 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
        description "The filtering abilities available.";
      }
 
+
+
+Gray                      Expires 6 March 2020                 [Page 10]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
      typedef field-type {
        type enumeration {
-
-
-
-Gray                     Expires 7 February 2020               [Page 10]
-
-Internet-Draft          Sampled Traffic Streaming            August 2019
-
-
          enum padding {
            description "Padding bits that MUST be ignored.";
          }
@@ -608,16 +610,16 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
          enum dropped-buffer {
            description "Dropped due to no buffer space.";
          }
+
+
+
+Gray                      Expires 6 March 2020                 [Page 11]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
          enum dropped-security {
            description "Dropped due to a security policy.";
-
-
-
-Gray                     Expires 7 February 2020               [Page 11]
-
-Internet-Draft          Sampled Traffic Streaming            August 2019
-
-
          }
          enum dropped-error {
            description "Dropped due to the frame being in error.";
@@ -640,6 +642,20 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
        description "Different possible destination types.";
      }
 
+     typedef direction-type {
+       type enumartion {
+         enum ingress {
+           description "Traffic flowing into the Replicator.";
+         }
+         enum egress {
+           description "Traffic flowing out of the Replicator.";
+         }
+         enum both {
+           description "Capture both ingress and egress traffic.";
+         }
+       }
+     }
+
      list points {
        description "A listing of the capture points available on this device, what ports they provide for, and what filtering is available at those points.";
        key name;
@@ -650,6 +666,14 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
        list interface {
          description "List of interfaces that are available at this point.";
          config false;
+
+
+
+Gray                      Expires 6 March 2020                 [Page 12]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
                      leaf if {
            mandatory true;
            type if:interface-ref;
@@ -666,14 +690,6 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
          }
        }
        leaf min-ratio {
-
-
-
-Gray                     Expires 7 February 2020               [Page 12]
-
-Internet-Draft          Sampled Traffic Streaming            August 2019
-
-
          type uint32 {
            range "1..max";
          }
@@ -706,6 +722,14 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
          description "A list of all the samplers attached to this point.";
 
          config true;
+
+
+
+Gray                      Expires 6 March 2020                 [Page 13]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
          key "name";
 
          leaf name {
@@ -722,14 +746,6 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
              description "The type of encoding for the destination.";
            }
            container udp-parameters {
-
-
-
-Gray                     Expires 7 February 2020               [Page 13]
-
-Internet-Draft          Sampled Traffic Streaming            August 2019
-
-
              description "Parameters for destination-type=udp.  Source port is always the port number assigned by IANA.";
              when "../type='udp'";
              leaf destination-ip {
@@ -762,6 +778,14 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
              type string;
            }
 
+
+
+
+Gray                      Expires 6 March 2020                 [Page 14]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
            list interfaces {
              when "../type = 'interfaces'";
              description "Filter down to only this list of interfaces.";
@@ -778,15 +802,17 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
              key "action";
              leaf action {
                description "One specific action code.";
-
-
-
-Gray                     Expires 7 February 2020               [Page 14]
-
-Internet-Draft          Sampled Traffic Streaming            August 2019
-
-
                type action-type;
+             }
+           }
+
+           list directions {
+             when "../type = 'direction'";
+             description "Which direction(s) to sample traffic in.";
+             key "direction";
+             leaf direction {
+               description "Specific direction code.";
+               type direction-type;
              }
            }
 
@@ -807,6 +833,14 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
              type inet:ipv6-address-no-zone;
              description "The IPv6 address to filter on.";
            }
+
+
+
+
+Gray                      Expires 6 March 2020                 [Page 15]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
 
            leaf version {
              when "../type = 'ip-version'";
@@ -834,14 +868,6 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
              description "Frame length to match on.";
            }
 
-
-
-
-Gray                     Expires 7 February 2020               [Page 15]
-
-Internet-Draft          Sampled Traffic Streaming            August 2019
-
-
          }
          container stream-format {
            config false;
@@ -864,6 +890,14 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
              leaf type {
                type field-type;
                description "The type of this data.";
+
+
+
+Gray                      Expires 6 March 2020                 [Page 16]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
              }
 
              list action-mappings {
@@ -890,14 +924,6 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
                }
                leaf port {
                  type if:interface-ref;
-
-
-
-Gray                     Expires 7 February 2020               [Page 16]
-
-Internet-Draft          Sampled Traffic Streaming            August 2019
-
-
                  description "The port the value maps to.";
                }
              }
@@ -920,6 +946,13 @@ Internet-Draft          Sampled Traffic Streaming            August 2019
        }
      }
    }
+
+
+
+Gray                      Expires 6 March 2020                 [Page 17]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
 
 Author's Address
 
@@ -949,4 +982,27 @@ Author's Address
 
 
 
-Gray                     Expires 7 February 2020               [Page 17]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gray                      Expires 6 March 2020                 [Page 18]
