@@ -80,7 +80,7 @@ Table of Contents
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .   8
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .   9
    Appendix A.  Yang Model . . . . . . . . . . . . . . . . . . . . .   9
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  18
 
@@ -364,6 +364,8 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
 
    *  Filtering on action
 
+   *  Filtering on direction of traffic
+
    A Client SHOULD take efforts to be notified when a change has
    occurred on the Replicator, and re-verify its replication
    configurations when such a change is detected.
@@ -384,8 +386,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
 
                                  Table 2
 
-   This document requests registration of a URI in the "IETF XML
-
 
 
 
@@ -394,6 +394,7 @@ Gray                      Expires 6 March 2020                  [Page 7]
 Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
+   This document requests registration of a URI in the "IETF XML
    Registry" RFC 3688 [RFC3688].  Following the format in RFC 3688, the
    following registration is suggested:
 
@@ -441,7 +442,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
               Management", RFC 8343, DOI 10.17487/RFC8343, March 2018,
               <https://www.rfc-editor.org/info/rfc8343>.
 
-7.2.  Informative References
 
 
 
@@ -449,6 +449,8 @@ Gray                      Expires 6 March 2020                  [Page 8]
 
 Internet-Draft          Sampled Traffic Streaming         September 2019
 
+
+7.2.  Informative References
 
 Appendix A.  Yang Model
 
@@ -497,8 +499,6 @@ Appendix A.  Yang Model
         described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
         they appear in all capitals, as shown here.";
 
-     revision 2019-06-25 {
-
 
 
 Gray                      Expires 6 March 2020                  [Page 9]
@@ -506,6 +506,14 @@ Gray                      Expires 6 March 2020                  [Page 9]
 Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
+     revision 2019-08-06 {
+       description
+         "Updates based on feedback for -01 draft.";
+       reference
+         "draft-gray-sampled-streaming-01";
+     }
+
+     revision 2019-06-25 {
        description
          "Initial version.";
        reference
@@ -546,14 +554,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
          }
          enum frame-size {
            description "The total size of the frame.";
-         }
-         enum frame-payload {
-           description "Specific payload octets.";
-         }
-       }
-
-       description "The filtering abilities available.";
-     }
 
 
 
@@ -562,16 +562,30 @@ Gray                      Expires 6 March 2020                 [Page 10]
 Internet-Draft          Sampled Traffic Streaming         September 2019
 
 
+         }
+         enum frame-payload {
+           description "Specific payload octets.";
+         }
+       }
+       description "The filtering abilities available.";
+     }
+
      typedef field-type {
        type enumeration {
          enum padding {
            description "Padding bits that MUST be ignored.";
          }
+         enum port {
+           description "An indication of the port the traffic was sampled from.";
+         }
+         enum direction {
+           description "Which direction the traffic went.";
+         }
          enum ingress-port {
-           description "An indication of the incoming port the frame was received on.";
+           description "What port the traffic was received from (may be different than 'port')";
          }
          enum egress-port {
-           description "An indication of the incoming port the frame was transmitted on.";
+           description "What port the traffic is leaving on (may be different than 'port')";
          }
          enum timestamp-msec {
            description "The timestamp the packet was received at, in integer milliseconds.";
@@ -592,11 +606,18 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
            description "The action that was taken on this frame.  Values are mapped as according to action-type.";
          }
        }
-
        description "Types of data included in the data stream provided back to the receiver.  Note that all fields will not be provided.";
      }
 
      typedef action-type {
+
+
+
+Gray                      Expires 6 March 2020                 [Page 11]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
        type enumeration {
          enum forwarded {
            description "Forwarded normally through the system.";
@@ -610,14 +631,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
          enum dropped-buffer {
            description "Dropped due to no buffer space.";
          }
-
-
-
-Gray                      Expires 6 March 2020                 [Page 11]
-
-Internet-Draft          Sampled Traffic Streaming         September 2019
-
-
          enum dropped-security {
            description "Dropped due to a security policy.";
          }
@@ -628,7 +641,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
            description "Frame was remarked and forwarded.";
          }
        }
-
        description "Possible actions taken on a packet.";
      }
 
@@ -638,12 +650,11 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
            description "Sent with a UDP header.";
          }
        }
-
        description "Different possible destination types.";
      }
 
      typedef direction-type {
-       type enumartion {
+       type enumeration {
          enum ingress {
            description "Traffic flowing into the Replicator.";
          }
@@ -654,6 +665,15 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
            description "Capture both ingress and egress traffic.";
          }
        }
+       description "Different possible direction types.";
+
+
+
+Gray                      Expires 6 March 2020                 [Page 12]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
      }
 
      list points {
@@ -666,20 +686,12 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
        list interface {
          description "List of interfaces that are available at this point.";
          config false;
-
-
-
-Gray                      Expires 6 March 2020                 [Page 12]
-
-Internet-Draft          Sampled Traffic Streaming         September 2019
-
-
-                     leaf if {
+                   leaf if {
            mandatory true;
            type if:interface-ref;
            description "An interface tied to this capture point.";
-                       }
-               }
+                     }
+             }
        list filters {
          description "List of filtering options available at this point.";
          config false;
@@ -710,6 +722,14 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
          description "The maximum number of filtering rules permitted at this location.  Note this is an absolute maximum, and fewer rules that are complex may still be rejected by the device.";
        }
        leaf max-frame-length-copy {
+
+
+
+Gray                      Expires 6 March 2020                 [Page 13]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
          type uint16;
          description "The maximum size that the point can replicate and copy into the header.";
        }
@@ -722,14 +742,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
          description "A list of all the samplers attached to this point.";
 
          config true;
-
-
-
-Gray                      Expires 6 March 2020                 [Page 13]
-
-Internet-Draft          Sampled Traffic Streaming         September 2019
-
-
          key "name";
 
          leaf name {
@@ -766,6 +778,14 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
            type uint32 {
              range "1..max";
            }
+
+
+
+Gray                      Expires 6 March 2020                 [Page 14]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
            description "The requested sampling ratio (1:N, with N being this value).";
          }
 
@@ -777,14 +797,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
              description "A name for this filter.";
              type string;
            }
-
-
-
-
-Gray                      Expires 6 March 2020                 [Page 14]
-
-Internet-Draft          Sampled Traffic Streaming         September 2019
-
 
            list interfaces {
              when "../type = 'interfaces'";
@@ -822,6 +834,14 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
              mandatory true;
            }
 
+
+
+
+Gray                      Expires 6 March 2020                 [Page 15]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
            leaf ipv4-address {
              when "../type = 'ip-v4-srcip' | ../type = 'ip-v4-dstip'";
              type inet:ipv4-address-no-zone;
@@ -833,14 +853,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
              type inet:ipv6-address-no-zone;
              description "The IPv6 address to filter on.";
            }
-
-
-
-
-Gray                      Expires 6 March 2020                 [Page 15]
-
-Internet-Draft          Sampled Traffic Streaming         September 2019
-
 
            leaf version {
              when "../type = 'ip-version'";
@@ -878,6 +890,14 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
 
              key "name";
              leaf name {
+
+
+
+Gray                      Expires 6 March 2020                 [Page 16]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
                type string;
                description "Human readable name of what this field contains.";
              }
@@ -890,14 +910,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
              leaf type {
                type field-type;
                description "The type of this data.";
-
-
-
-Gray                      Expires 6 March 2020                 [Page 16]
-
-Internet-Draft          Sampled Traffic Streaming         September 2019
-
-
              }
 
              list action-mappings {
@@ -928,6 +940,28 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
                }
              }
 
+             list direction-mappings {
+               description "The mapping of values to direction codes, valid for type=direction.";
+               key "value";
+               when "../type='direction'";
+               leaf value {
+                 type binary;
+
+
+
+Gray                      Expires 6 March 2020                 [Page 17]
+
+Internet-Draft          Sampled Traffic Streaming         September 2019
+
+
+                 description "The value that will appear in the header.";
+               }
+               leaf direction {
+                 type direction-type;
+                 description "The direction the traffic in respect to the port.";
+               }
+             }
+
              container timestamp {
                description "Supplemental data for type=timestamp*, in PTP Truncated Timestamp Format.  Provides the time used as the epoch for the number in the data stream.";
                when "../type='timestamp-nsec' | ../type='timestamp-usec' | ../type='timestamp-msec'";
@@ -947,13 +981,6 @@ Internet-Draft          Sampled Traffic Streaming         September 2019
      }
    }
 
-
-
-Gray                      Expires 6 March 2020                 [Page 17]
-
-Internet-Draft          Sampled Traffic Streaming         September 2019
-
-
 Author's Address
 
    Andrew Gray (editor)
@@ -964,33 +991,6 @@ Author's Address
 
    Phone: +1 720 699 5125
    Email: Andrew.Gray@charter.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

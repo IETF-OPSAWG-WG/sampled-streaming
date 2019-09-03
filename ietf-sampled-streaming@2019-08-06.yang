@@ -105,11 +105,17 @@ module ietf-sampled-streaming {
       enum padding {
         description "Padding bits that MUST be ignored.";
       }
+      enum port {
+        description "An indication of the port the traffic was sampled from.";
+      }
+      enum direction {
+        description "Which direction the traffic went.";
+      }
       enum ingress-port {
-        description "An indication of the incoming port the frame was received on.";
+        description "What port the traffic was received from (may be different than 'port')";
       }
       enum egress-port {
-        description "An indication of the incoming port the frame was transmitted on.";
+        description "What port the traffic is leaving on (may be different than 'port')";
       }
       enum timestamp-msec {
         description "The timestamp the packet was received at, in integer milliseconds.";
@@ -414,6 +420,20 @@ module ietf-sampled-streaming {
               type if:interface-ref;
               description "The port the value maps to.";
             }              
+          }
+
+          list direction-mappings {
+            description "The mapping of values to direction codes, valid for type=direction.";
+            key "value";
+            when "../type='direction'";
+            leaf value {
+              type binary;
+              description "The value that will appear in the header.";
+            }
+            leaf direction {
+              type direction-type;
+              description "The direction the traffic in respect to the port.";
+            }
           }
  
           container timestamp {
