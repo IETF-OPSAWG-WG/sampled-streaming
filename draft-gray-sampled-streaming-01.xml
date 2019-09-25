@@ -33,7 +33,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="info" docName="draft-gray-sampled-streaming-00" ipr="trust200902" xmlns:xi="http://www.w3.org/2001/XInclude">
+<rfc category="info" docName="draft-gray-sampled-streaming-01" ipr="trust200902" xmlns:xi="http://www.w3.org/2001/XInclude">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
@@ -135,7 +135,8 @@
     </section>
     
     <section title="Data Stream Format">
-    <t>After the stream setup, the Client MUST re-query the stream configuration to get the stream-format data that the remote device has calculated.  The Client MUST NOT assume that the stream-format data is consistent between one instance and any other performed (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the Payload is always at the end (as it is the only variable-width field, it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  This provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.  As an example (but not a nominative listing of what this may be - the actual format can be any combination of fields, of any size, in any order), the data inside the resulting data stream after the UDP tunnel header may look like the following:</t>
+    <t>After the stream setup, the Client MUST re-query the stream configuration to get the stream-format data that the remote device has calculated.  The Client MUST NOT assume that the stream-format data is consistent between one instance and any other performed (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the Payload is always at the end (as it is the only variable-width field, it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  This provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.</t>
+    <t>One example of what the resulting packet may look like (but not a nominative listing of what it is - the actual format can be any combination of fields, of any size, in any order), the data inside the resulting data stream after the UDP tunnel header may look like the following:</t>
     
     <figure align="center" anchor="expl_payload"><preamble>Example layout:</preamble>
     
