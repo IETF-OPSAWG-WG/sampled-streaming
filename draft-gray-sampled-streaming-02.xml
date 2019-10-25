@@ -141,8 +141,8 @@
     </section>
     
     <section title="Data Stream Format">
-    <t>After the stream setup, the Client MUST re-query the stream configuration to get the stream-format data that the remote device has calculated.  The Client MUST NOT assume that the stream-format data is consistent between one instance and any other (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the Payload is always at the end (it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  This provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.</t>
-    <t>There is one captured packet per encapsulated packet, and thus the outer encapsulation length can be used to deduce the length of one variable-length field (designed by a field length of 0) contained within.  If there is more than one variable-length field, a matching "-size" type MUST be provided for all but one of the variable-length fields (as a single variable length can be deduced from the wrapper length).</t>
+    <t>After the stream setup, the Client MUST re-query the stream configuration to get the stream-format data that the remote device has calculated.  The Client MUST NOT assume that the stream-format data is consistent between one stream setup and any other (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the Payload is always at the end (it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  The stream-format data provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.</t>
+    <t>There is one captured packet per encapsulated packet, and thus the outer encapsulation length can be used to deduce the length of one variable-length field (designed by a field length of 0) contained within.  If there is more than one variable-length field, a matching "-size" field type MUST be provided for all but one of the variable-length fields (as a single variable length can be deduced from the wrapper length).</t>
     <t>One example of what the resulting packet may look like (but not a nominative listing of what it is - the actual format can be any combination of fields, of any size, in any order), the data inside the resulting data stream after the UDP tunnel header may look like the following:</t>
     
     <figure align="center" anchor="expl_payload"><preamble>Example layout 1:</preamble>
@@ -239,7 +239,6 @@ reference: This document]]></artwork></figure>
   <!--  *****BACK MATTER ***** -->
 
   <back>
-
     <references title="Normative References">
       <!--?rfc include="http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
       &RFC2119;
