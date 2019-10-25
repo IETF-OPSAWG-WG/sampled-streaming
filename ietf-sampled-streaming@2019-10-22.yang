@@ -42,7 +42,10 @@ module ietf-sampled-streaming {
 
   revision 2019-10-22 {
     description 
-      "Updates based on feedback for -02 draft: Adding more forwarded action-types.  frame-payload changed to be explicit about direction.";
+      "Updates based on feedback for -02 draft: Adding more forwarded 
+      action-types.  frame-payload changed to be explicit about 
+      direction.  Added -size types explicitly for frame-payload and
+      padding to allow using more than one zero-length field.";
     reference
       "draft-gray-sampled-streaming-02";
   }
@@ -67,7 +70,9 @@ module ietf-sampled-streaming {
         description "List of interfaces to filter against.";
       }
       enum action {
-        description "Filter against a list of actions that the Point took (i.e., only consider packets that were actually forwarded).";
+        description "Filter against a list of actions that the Point 
+        took (i.e., only consider packets that were actually 
+        forwarded).";
       }
       enum direction {
         description "Direction to sample traffic in.";
@@ -112,49 +117,72 @@ module ietf-sampled-streaming {
         description "Padding bits that MUST be ignored.";
       }
       enum padding-size {
-        description "This packet's length of a variable-length padding field.";
+        description "This packet's length of a variable-length padding
+         field.";
       }
       enum port {
-        description "An indication of the port the traffic was sampled from.";
+        description "An indication of the port the traffic was sampled
+         from.";
       }
       enum direction {
         description "Which direction the traffic went.";
       }
       enum port-ingress {
-        description "What port the traffic was received from (may be different than 'port')";
+        description "What port the traffic was received from (may be
+         different than 'port')";
       }
       enum port-egress {
-        description "What port the traffic is leaving on (may be different than 'port')";
+        description "What port the traffic is leaving on (may be
+         different than 'port')";
       }
       enum timestamp-msec-ingress {
-        description "The timestamp the packet was received at, in integer milliseconds.  The epoch of this number is provided in the timestamp container of the returned field information.";
+        description "The timestamp the packet was received at, in
+         integer milliseconds.  The epoch of this number is provided in
+          the timestamp container of the returned field information.";
       }
       enum timestamp-usec-ingress {
-        description "The timestamp the packet was received at, in integer microseconds.  The epoch of this number is provided in the timestamp container of the returned field information.";
+        description "The timestamp the packet was received at, in
+         integer microseconds.  The epoch of this number is provided in
+          the timestamp container of the returned field information.";
       }      
       enum timestamp-nsec-ingress {
-        description "The timestamp the packet was received at, in integer nanoseconds.  The epoch of this number is provided in the timestamp container of the returned field information.";
+        description "The timestamp the packet was received at, in
+         integer nanoseconds.  The epoch of this number is provided in
+          the timestamp container of the returned field information.";
       }
       enum timestamp-msec-egress {
-        description "The timestamp the packet left the point at, in integer milliseconds.  The epoch of this number is provided in the timestamp container of the returned field information.";
+        description "The timestamp the packet left the point at, in
+         integer milliseconds.  The epoch of this number is provided in
+          the timestamp container of the returned field information.";
       }
       enum timestamp-usec-egress {
-        description "The timestamp the packet left the point at, in integer microseconds.  The epoch of this number is provided in the timestamp container of the returned field information.";
+        description "The timestamp the packet left the point at, in
+         integer microseconds.  The epoch of this number is provided in
+         the timestamp container of the returned field information.";
       }      
       enum timestamp-nsec-egress {
-        description "The timestamp the packet left the point at, in integer nanoseconds.  The epoch of this number is provided in the timestamp container of the returned field information.";
+        description "The timestamp the packet left the point at, in
+         integer nanoseconds.  The epoch of this number is provided in
+         the timestamp container of the returned field information.";
       }
       enum frame-length {
-        description "The generic frame length.  Note that due to chipset capabilities, this MAY NOT be the same as the captured packet length.";
+        description "The generic frame length.  Note that due to 
+         chipset capabilities, this MAY NOT be the same as the captured
+         packet length.";
       }      
       enum frame-length-ingress {
-        description "The frame length as received by the point.  Note that due to chipset capabilities, this MAY NOT be the same as the captured packet length.";
+        description "The frame length as received by the point.  Note
+         that due to chipset capabilities, this MAY NOT be the same as
+         the captured packet length.";
       }
       enum frame-length-egress {
-        description "The frame length after local processing, as it leaves the point.  Note that due to chipset capabilities, this MAY NOT be the same as the captured packet length.";
+        description "The frame length after local processing, as it
+         leaves the point.  Note that due to chipset capabilities, this
+         MAY NOT be the same as the captured packet length.";
       }
       enum frame-payload-size {
-        description "The length of the payload that has actually been copied into this stream.";
+        description "The length of the payload that has actually been
+         copied into this stream.";
       }
       enum frame-payload-ingress {
         description "The payload of the frame, as received the point.";
@@ -163,19 +191,23 @@ module ietf-sampled-streaming {
         description "The payload of the frame, as it leaves the point.";
       }
       enum action {
-        description "The action that was taken on this frame.  Values are mapped as according to action-type.";
+        description "The action that was taken on this frame.  Values
+         are mapped as according to action-type.";
       }
     }
-    description "Types of data included in the data stream provided back to the receiver.  Note that all fields MAY NOT be provided.";
+    description "Types of data included in the data stream provided
+     back to the receiver.  Note that all fields MAY NOT be provided.";
   }
 
   typedef action-type {
     type enumeration {
       enum forwarded {
-        description "Generically forwarded normally through the system.  A more specific action type code SHOULD be used.";
+        description "Generically forwarded normally through the system.
+         A more specific action type code SHOULD be used.";
       }
       enum forwarded-label-change {
-        description "Forwarded, with a generic MPLS label change having occurred.";
+        description "Forwarded, with a generic MPLS label change having
+         occurred.";
       }
       enum forwarded-label-swap {
         description "Forwarded, with a MPLS label swap.";
@@ -190,13 +222,16 @@ module ietf-sampled-streaming {
         description "Forwarded after a CPU punt.";
       }
       enum forwarded-tunnel {
-        description "Forwarded with additional outer wrapper for tunneling.";
+        description "Forwarded with additional outer wrapper for
+         tunneling.";
       }
       enum forwarded-tunnel-frr {
-        description "Forwarded with additional outer wrapper due to fast reroute.";
+        description "Forwarded with additional outer wrapper due to
+         fast reroute.";
       }
       enum dropped {
-        description "Generically dropped.  A more specific action type code SHOULD be used.";
+        description "Generically dropped.  A more specific action type
+         code SHOULD be used.";
       }
       enum dropped-rate-limit {
         description "Dropped due to a rate limiter applied.";
@@ -214,7 +249,8 @@ module ietf-sampled-streaming {
         description "Dropped after a CPU punt.";
       }
       enum passed-to-cpu {
-        description "Passed on to the CPU, but what the CPU did with it is unknown.";
+        description "Passed on to the CPU, but what the CPU did with it
+         is unknown.";
       }
     }
     description "Possible actions taken on a packet.";
@@ -245,14 +281,17 @@ module ietf-sampled-streaming {
   }
     
   list points {
-    description "A listing of the capture points available on this device, what ports they provide for, and what filtering is available at those points.";
+    description "A listing of the capture points available on this
+     device, what ports they provide for, and what filtering is
+      available at those points.";
     key name;
     leaf name {
       type string;
       description "The name of this capture point.";
     }
     list interface {
-      description "List of interfaces that are available at this point.";
+      description "List of interfaces that are available at this
+       point.";
       config false;
 	  	leaf if {
         mandatory true;
@@ -261,7 +300,8 @@ module ietf-sampled-streaming {
 		  }
 	  }
     list filters {
-      description "List of filtering options available at this point.";
+      description "List of filtering options available at this
+       point.";
       config false;
       leaf filter {
         description "One specific filter available at this point.";
@@ -273,29 +313,36 @@ module ietf-sampled-streaming {
       type uint32 {
         range "1..max";
       }
-      description "The minimum sampling ratio (1:N, with N being this value) this point can provide.";
+      description "The minimum sampling ratio (1:N, with N being this
+       value) this point can provide.";
     }
     leaf max-ratio {
       type uint32 {
         range "1..max";
       }
-      description "The maximum sampling ratio (1:N, with N being this value) this point can provide.";
+      description "The maximum sampling ratio (1:N, with N being this
+       value) this point can provide.";
     }
     leaf max-samplers {
       type uint32;
-      description "The maximum number of samplers that can be installed at this point.";
+      description "The maximum number of samplers that can be installed
+       at this point.";
     }
     leaf max-filters {
       type uint32;
-      description "The maximum number of filtering rules permitted at this location.  Note this is an absolute maximum, and fewer rules that are complex may still be rejected by the device.";
+      description "The maximum number of filtering rules permitted at
+       this location.  Note this is an absolute maximum, and fewer
+        rules that are complex may still be rejected by the device.";
     }
     leaf max-frame-length-copy {
       type uint16;
-      description "The maximum size that the point can replicate and copy into the header.";
+      description "The maximum size that the point can replicate and
+       copy into the header.";
     }
     leaf max-frame-depth-inspect {
       type uint16;
-      description "The offset of the last octet in a frame the ASIC can perform filtering against.";
+      description "The offset of the last octet in a frame the ASIC can
+       perform filtering against.";
     }
 
     list samplers {
@@ -318,7 +365,8 @@ module ietf-sampled-streaming {
           description "The type of encoding for the destination.";
         }
         container udp-parameters {
-          description "Parameters for destination-type=udp.  Source port is always the port number assigned by IANA.";
+          description "Parameters for destination-type=udp.  Source
+           port is always the port number assigned by IANA.";
           when "../type='udp'";
           leaf destination-ip {
             mandatory true;
@@ -328,7 +376,8 @@ module ietf-sampled-streaming {
           leaf destination-port {
             mandatory true;
             type inet:port-number;
-            description "The destination UDP port number to send the stream to.";
+            description "The destination UDP port number to send the
+             stream to.";
           }
         }
       }
@@ -338,11 +387,13 @@ module ietf-sampled-streaming {
         type uint32 {
           range "1..max";
         }
-        description "The requested sampling ratio (1:N, with N being this value).";
+        description "The requested sampling ratio (1:N, with N being
+         this value).";
       }
 
       list filters {
-        description "A list of filters applied to this sampling.  Multiple filters are logically ANDed together.";
+        description "A list of filters applied to this sampling. 
+         Multiple filters are logically ANDed together.";
 
         key "name";
         leaf name {
@@ -409,7 +460,8 @@ module ietf-sampled-streaming {
           description "Frame payload fragment to match on.";
 
           leaf offset {
-            description "Offset in octets from the start of the frame to begin the match on.";
+            description "Offset in octets from the start of the frame
+             to begin the match on.";
             type uint16;
           }
           leaf match {
@@ -427,21 +479,27 @@ module ietf-sampled-streaming {
       }
       container stream-format {
         config false; 
-        description "This contains the packet format data that this sampling stream is sending.  This is only valid after configuration.  The length fields are given in bits, and are consecutive.  Needed gaps should use a 'padding' element.";
+        description "This contains the packet format data that this
+         sampling stream is sending.  This is only valid after
+         configuration.  The length fields are given in bits, and are
+         consecutive.  Needed gaps should use a 'padding' element.";
 
         list fields {
-          description "The listing of the fields that will be encapsulated and sent to the receiver.";
+          description "The listing of the fields that will be
+           encapsulated and sent to the receiver.";
 
           key "name";
           leaf name {
             type string;
-            description "Human readable name of what this field contains.";
+            description "Human readable name of what this field
+             contains.";
           }
           leaf size {
             type uint32 {
               range "0..524280";
             }
-            description "The size of this field, in bits.  The value of '0' denotes a variable-sized field.";
+            description "The size of this field, in bits.  The value
+             of '0' denotes a variable-sized field.";
           }
           leaf type {
             type field-type;
@@ -449,7 +507,8 @@ module ietf-sampled-streaming {
           }
 
           list action-mappings {
-            description "The mapping of values to action-type codes, valid for type=action.";
+            description "The mapping of values to action-type codes,
+             valid for type=action.";
             key "value";
             when "../type='action'";
             leaf value {
@@ -463,7 +522,8 @@ module ietf-sampled-streaming {
           }
  
           list port-mappings {
-            description "The mapping of values to interfaces, valid for type=ingress-port or type=egress-port";
+            description "The mapping of values to interfaces, valid for
+             type=ingress-port or type=egress-port";
             key "value";
             when "../type='ingress-port' | ../type='egress-port'";
             leaf value {
@@ -477,7 +537,8 @@ module ietf-sampled-streaming {
           }
 
           list direction-mappings {
-            description "The mapping of values to direction codes, valid for type=direction.";
+            description "The mapping of values to direction codes,
+             valid for type=direction.";
             key "value";
             when "../type='direction'";
             leaf value {
@@ -486,21 +547,27 @@ module ietf-sampled-streaming {
             }
             leaf direction {
               type direction-type;
-              description "The direction the traffic in respect to the port.";
+              description "The direction the traffic in respect to the
+               port.";
             }
           }
  
           container timestamp {
-            description "Supplemental data for type=timestamp*, in PTP Truncated Timestamp Format.  Provides the time used as the epoch for the number in the data stream.";
-            when "../type='timestamp-nsec' | ../type='timestamp-usec' | ../type='timestamp-msec'";
+            description "Supplemental data for type=timestamp*, in PTP
+             Truncated Timestamp Format.  Provides the time used as the
+             epoch for the number in the data stream.";
+            when "../type='timestamp-nsec' | ../type='timestamp-usec' |
+             ../type='timestamp-msec'";
  
             leaf seconds {
               type uint32;
-              description "Specifies the integer portion of the number of seconds since the epoch.";
+              description "Specifies the integer portion of the number 
+               of seconds since the epoch.";
             }
             leaf nanoseconds {
               type uint32;
-              description "Specifies the fractional portion of the number of seconds since the epoch, in integer number of nanoseconds.";                  
+              description "Specifies the fractional portion of the number
+               of seconds since the epoch, in integer number of nanoseconds.";                  
             }
           }
         }

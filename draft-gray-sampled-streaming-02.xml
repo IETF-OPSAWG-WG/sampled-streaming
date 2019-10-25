@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-
+<!DOCTYPE rfc SYSTEM 'rfc2629.dtd' [
 <!ENTITY RFC2119 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
 <!ENTITY RFC2784 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2784.xml">
 <!ENTITY RFC3688 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3688.xml">
@@ -9,6 +8,7 @@
 <!ENTITY RFC8343 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8343.xml">
 <!ENTITY PCAPNG SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.tuexen-opsawg-pcapng.xml">
 ]>
+
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 <!-- used by XSLT processors -->
 <!-- For a complete list and description of processing instructions (PIs), 
@@ -39,12 +39,9 @@
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
      they will automatically be output with "(if approved)" -->
-
   <!-- ***** FRONT MATTER ***** -->
-
   <front>
     <title>Sampled Traffic Streaming</title>
-
     <author fullname="Andrew Gray" initials="A." role="editor" surname="Gray">
       <organization>Charter Communications</organization>
       <address>
@@ -59,50 +56,42 @@
         <email>Andrew.Gray@charter.com</email>
       </address>
     </author>
-
-    <date year="2019" />
-
+    <date year="2019"/>
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
          in the current day for you. If only the current year is specified, xml2rfc will fill 
-	 in the current day and month for you. If the year is not the current one, it is 
-	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
-	 purpose of calculating the expiry date).  With drafts it is normally sufficient to 
-	 specify just the year. -->
-
+   in the current day and month for you. If the year is not the current one, it is 
+   necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
+   purpose of calculating the expiry date).  With drafts it is normally sufficient to 
+   specify just the year. -->
     <!-- Meta-data Declarations -->
-
     <area>General</area>
-
     <workgroup>Internet Engineering Task Force</workgroup>
-
     <keyword>template</keyword>
-
     <abstract>
       <t>This document standardizes the means of requesting a sampled capture stream from a router, receiving details about the resulting data flow, and the structure of the data flow itself.  This is specifically tailored to having various hardware ASICs be able to perform this operation as quickly as possible, by allowing communication of the specific bit formats of headers applied to the packet flow, in a way that enhances interoperability between sources and sinks.  Historically, NetFlow and its ilk have been used for these use cases, however the growth in hardware forward speeds is far outpacing the growth in CPU speeds, and the CPU-heavy parts of NetFlow is resulting in a reduction of sampling rates that include all of the fields provided by NetFlow that require CPU lookups.</t>
     </abstract>
   </front>
 
+
   <middle>
     <section title="Introduction">
       <section title="Requirements Language">
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-        document are to be interpreted as described in <xref
-        target="RFC2119">RFC 2119</xref>.</t>
+        <t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;,
+        &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
+        document are to be interpreted as described in 
+          <xref target="RFC2119">RFC 2119</xref>
+          .</t>
       </section>
-
       <section title="Terminology">
         <t>The following terms are used within this document:
           <list>
             <t>Client: The device configuring the Replicator.</t>
             <t>Receiver: The device that will be receiving the packet stream.</t>
             <t>Replicator: The device doing the actual packet replication, as requested by a Client, and sending it to a Receiver.</t>
-            <t>Point: The location inside the Replicator (generally a forwarding ASIC) that performs the actual packet replication.  There may be multiple physical interfaces serviced by one Point, or one interface may be serviced by multiple Points, that may have different capabilities.</t>
-          </list>
+            <t>Point: The location inside the Replicator (generally a forwarding ASIC) that performs the actual packet replication.  There may be multiple physical interfaces serviced by one Point, or one interface may be serviced by multiple Points, that may have different capabilities.</t></list>
         </t>
       </section>
     </section>
-
     <section title="Problem Statement / Operator Use Cases">
       <t>This document is designed around the following use cases that operators have today, or can foresee coming on the near horizon.</t>
       <section title="Use Case 1 : Traffic Analytics">
@@ -110,7 +99,7 @@
         <t>This proposal addresses this use case by making the data replication as simple as possible for hardware forwarding ASICs to implement and send off the device.  This allows offloading the heavy calculations to distributed infrastructure than can be scaled as needed using commodity hardware.</t>
       </section>
       <section title="Use Case 2 : Network Behavior Verification">
-        <t>This use case focuses on the potential ability to have the ASICs also include packets that would normally be dropped, along with a reason why.  With bits denoting dropped due to QoS policies, buffer contention, ACLs, etc., this traffic could be captured (potentially at a sampling rate of 1:1, i.e. every packet) and sent off for off-box analysis to determine if this was expected, or to provide alerts that QoS policies may be having adverse effects on the network.  Here, including the packet payload provides a lot of additional data for these platforms to effectively "second guess" these policies.</t>
+        <t>This use case focuses on the potential ability to have the ASICs also include packets that would normally be dropped, along with a reason why.  With bits denoting dropped due to QoS policies, buffer contention, ACLs, etc., this traffic could be captured (potentially at a sampling rate of 1:1, i.e. every packet) and sent off for off-box analysis to determine if this was expected, or to provide alerts that QoS policies may be having adverse effects on the network.  Here, including the packet payload provides a lot of additional data for these platforms to effectively &quot;second guess&quot; these policies.</t>
         <t>This proposal addresses this use case by explicitly including a field for marking what an ASIC is going to do with a packet, and including the payload of the resulting sample.</t>
       </section>
       <section title="Use Case 3 : Standardization">
@@ -118,36 +107,36 @@
         <t>This proposal addresses this use case by allowing the packet header to contain any combination of information, in any position and of any length, to be dynamically determined and information about how to handle this data to be exchanged between the Replicator, Client, and Receiver.  This allows ASICs to put on what information they can, in the most efficient format for them.</t>
       </section>
       <section title="Use Case 4: Security Automation">
-        <t>An automated security platform can utilize this proposal to set up a "normal security analysis" stream at a very low sampling rate (for example, 1 in 20,000) for constant monitoring at various points throughout the network.  Upon seeing something it deems 'interesting', or by manual input, it can add in an additional, targeted, stream, at a very high sampling rate (potentionally 1 to 1) for detailed analysis and mitigation efforts.</t>
+        <t>An automated security platform can utilize this proposal to set up a &quot;normal security analysis&quot; stream at a very low sampling rate (for example, 1 in 20,000) for constant monitoring at various points throughout the network.  Upon seeing something it deems 'interesting', or by manual input, it can add in an additional, targeted, stream, at a very high sampling rate (potentionally 1 to 1) for detailed analysis and mitigation efforts.</t>
         <t>Examples of past incidents where this may have been useful are the NTP MONLIST attacks, DNS attacks, or DDoS attacks (although 1:1 would most likely not be used in a DDoS case, unless performing initial data collection).</t>
         <t>The security platform could potentially then use the collected packets to generate an auto-mitigation plan based on heuristics (i.e., 99% of this sudden burst of traffic has something in common, deploy mitigation targeting that.)</t>
       </section>
     </section>
-    
     <section title="Stream Setup">
-      <t>To begin, a Client utilizes a supported configuration method (NETCONF, RESTCONF, gRPC, etc.) and the YANG model listed in Appendix A.  A Client must first request from the Replicator the available configurations via the 'points' branch, which provides the following information:<ul>
-        <li><t>A name of the Point.</t></li>
-        <li><t>What interfaces this Point is servicing.</t></li>
-        <li><t>If filtering is available, and if so, what filters can be applied (against certain IP fields, against parts of the frame, etc.)</t></li>
-        <li><t>Minimum and maximum sampling rates.</t></li>
-        <li><t>Any current samplers already active off this Point.</t></li>
-        <li><t>Optionally, the maximum frame length the Point can replicate into the sample.</t></li>
-        <li><t>Optionally, the maximum offset into a frame the Point can inspect.</t></li>
-        <li><t>Optionally, the maximum number of samplers that this Point can accommodate.  A Client MUST still check for success, as highly complex filters may reduce the amount of replication the Point can do from this maximum.</t></li>
-      </ul></t>
+      <t>To begin, a Client utilizes a supported configuration method (NETCONF, RESTCONF, gRPC, etc.) and the YANG model listed in Appendix A.  A Client must first request from the Replicator the available configurations via the 'points' branch, which provides the following information:
+        <ul>
+          <li><t>A name of the Point.</t></li>
+          <li><t>What interfaces this Point is servicing.</t></li>
+          <li><t>If filtering is available, and if so, what filters can be applied (against certain IP fields, against parts of the frame, etc.)</t></li>
+          <li><t>Minimum and maximum sampling rates.</t></li>
+          <li><t>Any current samplers already active off this Point.</t></li>
+          <li><t>Optionally, the maximum frame length the Point can replicate into the sample.</t></li>
+          <li><t>Optionally, the maximum offset into a frame the Point can inspect.</t></li>
+          <li><t>Optionally, the maximum number of samplers that this Point can accommodate.  A Client MUST still check for success, as highly complex filters may reduce the amount of replication the Point can do from this maximum.</t></li>
+        </ul>
+      </t>
       <t>The Client then can request one or more streams to be set up on the Replicator, using that information.</t>
       <t>These individual streams may be configured with filters and a sampling rate, with the replicated packets sent to the Receiver, wrapped in an outer UDP header.  The available filters are provided by the Replicator in the response above - a common option will be for what interface specifically to filter traffic against.  The source port of this UDP stream MUST be set to TBD1 by default - Replicators MAY offer an ability to change this default.  This is to allow security filters to have a fixed value to key off of as an additional defense to prevent these streams from being inadvertently sent to undesirable locations.</t>
       <t>The Client and Receiver MAY be separate devices.  The mechanism of exchanging information between Client and Receiver about the setup process is outside the scope of this document.</t>
     </section>
-    
     <section title="Data Stream Format">
-    <t>After the stream setup, the Client MUST re-query the stream configuration to get the stream-format data that the remote device has calculated.  The Client MUST NOT assume that the stream-format data is consistent between one stream setup and any other (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the Payload is always at the end (it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  The stream-format data provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.</t>
-    <t>There is one captured packet per encapsulated packet, and thus the outer encapsulation length can be used to deduce the length of one variable-length field (designed by a field length of 0) contained within.  If there is more than one variable-length field, a matching "-size" field type MUST be provided for all but one of the variable-length fields (as a single variable length can be deduced from the wrapper length).</t>
-    <t>One example of what the resulting packet may look like (but not a nominative listing of what it is - the actual format can be any combination of fields, of any size, in any order), the data inside the resulting data stream after the UDP tunnel header may look like the following:</t>
-    
-    <figure align="center" anchor="expl_payload"><preamble>Example layout 1:</preamble>
-    
-    <artwork><![CDATA[
+      <t>After the stream setup, the Client MUST re-query the stream configuration to get the stream-format data that the remote device has calculated.  The Client MUST NOT assume that the stream-format data is consistent between one stream setup and any other (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the Payload is always at the end (it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  The stream-format data provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.</t>
+      <t>There is one captured packet per encapsulated packet, and thus the outer encapsulation length can be used to deduce the length of one variable-length field (designed by a field length of 0) contained within.  If there is more than one variable-length field, a matching &quot;-size&quot; field type MUST be provided for all but one of the variable-length fields (as a single variable length can be deduced from the wrapper length).</t>
+      <t>One example of what the resulting packet may look like (but not a nominative listing of what it is - the actual format can be any combination of fields, of any size, in any order), the data inside the resulting data stream after the UDP tunnel header may look like the following:</t>
+      <figure align="center" anchor="expl_payload">
+        <preamble>Example layout 1:</preamble>
+        <artwork>
+          <![CDATA[
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -158,110 +147,104 @@
 |                           Payload                             |
 |                             ...                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-]]></artwork></figure>
-
-	<t>This non-normative example would be listed in the modeled data for packet-format as per the following table:</t>
-  <texttable title="Packet-format response example 1">
-    <ttcol>Name</ttcol>
-    <ttcol>Size</ttcol>
-    <ttcol>Type</ttcol>
-    <ttcol>Type-Data</ttcol>
-    <c>Incoming port</c><c>8</c><c>port-ingress</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"></xref>.</c>
-    <c>Timestamp</c><c>24</c><c>timestamp-nsec-ingress</c><c>Two 32 bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
-    <c>Act</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
-    <c>Frame Length</c><c>17</c><c>frame-length-ingress</c><c>Note that this denotes the original frame length - the payload field MAY NOT include the entire payload.</c>
-    <c>Internal Data 1</c><c>13</c><c>padding</c><c></c>
-    <c>Payload</c><c>0</c><c>frame-payload-ingress</c><c></c>
-  </texttable>
-
-<t>Another non-normative example, which is similar to the <xref target="I-D.tuexen-opsawg-pcapng" /> enhanced packet block (EPB) format (and thus, this Replicator may in fact be a server offering a tcpdump-based backend using this frontend):</t>
-<texttable title="Packet-format response example 2">
-    <ttcol>Name</ttcol>
-    <ttcol>Size</ttcol>
-    <ttcol>Type</ttcol>
-    <ttcol>Type-Data</ttcol>
-    <c>Interface ID</c><c>32</c><c>port</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"></xref>.</c>
-    <c>Timestamp</c><c>64</c><c>timestamp-msec</c><c>Two 32 bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
-    <c>Captured Packet Length</c><c>32</c><c>frame-payload-size</c><c>Note: This allows us to have the Options field as our real variable length field.</c>
-    <c>Original Packet Length</c><c>32</c><c>frame-length</c><c>None</c>
-    <c>Packet Data</c><c>0</c><c>frame-payload</c><c>None</c>
-    <c>Options</c><c>0</c><c>padding</c><c>None</c>
-</texttable>
-
-  <t>To restate the prior note, the above is purely an example of what the format could be - the actual format used is negotiated between the Client and Replicator, and can have practically any layout, with any additional fields.</t>
-
-  <t>To adequately addresses the use cases stated above, a Replicator SHOULD support as a minimum set of capabilities:<ul>
-    <li><t>An action field that denotes a pass or drop (ideally with drop reason)</t></li>
-    <li><t>The payload of at least 128 octets</t></li>
-    <li><t>The original frame length</t></li>
-    <li><t>Sampling rates down to 1:1 (i.e. every packet is replicated)</t></li>
-    <li><t>Having different sampling sessions having different sampling rates (to allow a "general" session to be watching a broad selection of traffic, and more specific sessions targeting exact flows or situations)</t></li>
-    <li><t>At least two sessions per physical interface</t></li>
-    <li><t>Filtering on ingress port</t></li>
-    <li><t>Filtering on action</t></li>
-    <li><t>Filtering on direction of traffic</t></li>
-    </ul></t>
-
-    <t>A Client SHOULD take efforts to be notified when a change has occurred on the Replicator, and re-verify its replication configurations when such a change is detected.</t>
-
-	</section>
-
-
+]]>
+        </artwork>
+      </figure>
+      <t>This non-normative example would be listed in the modeled data for packet-format as per the following table:</t>
+      <texttable title="Packet-format response example 1">
+        <ttcol>Name</ttcol>
+        <ttcol>Size</ttcol>
+        <ttcol>Type</ttcol>
+        <ttcol>Type-Data</ttcol>
+        <c>Incoming port</c><c>8</c><c>port-ingress</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"/>.</c>
+        <c>Timestamp</c><c>24</c><c>timestamp-nsec-ingress</c><c>Two 32 bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
+        <c>Act</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
+        <c>Frame Length</c><c>17</c><c>frame-length-ingress</c><c>Note that this denotes the original frame length - the payload field MAY NOT include the entire payload.</c>
+        <c>Internal Data 1</c><c>13</c><c>padding</c><c/>
+        <c>Payload</c><c>0</c><c>frame-payload-ingress</c><c/>
+      </texttable>
+      <t>Another non-normative example, which is similar to the <xref target="I-D.tuexen-opsawg-pcapng"/> enhanced packet block (EPB) format (and thus, this Replicator may in fact be a server offering a tcpdump-based backend using this frontend):</t>
+      <texttable title="Packet-format response example 2">
+        <ttcol>Name</ttcol>
+        <ttcol>Size</ttcol>
+        <ttcol>Type</ttcol>
+        <ttcol>Type-Data</ttcol>
+        <c>Interface ID</c><c>32</c><c>port</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"/>.</c>
+        <c>Timestamp</c><c>64</c><c>timestamp-msec</c><c>Two 32 bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
+        <c>Captured Packet Length</c><c>32</c><c>frame-payload-size</c><c>Note: This allows us to have the Options field as our real variable length field.</c>
+        <c>Original Packet Length</c><c>32</c><c>frame-length</c><c/>
+        <c>Packet Data</c><c>0</c><c>frame-payload</c><c/>
+        <c>Options</c><c>0</c><c>padding</c><c/>
+      </texttable>
+      <t>To restate the prior note, the above is purely an example of what the format could be - the actual format used is negotiated between the Client and Replicator, and can have practically any layout, with any additional fields.</t>
+      <t>To adequately addresses the use cases stated above, a Replicator SHOULD support as a minimum set of capabilities:
+        <ul>
+          <li><t>An action field that denotes a pass or drop (ideally with drop reason)</t></li>
+          <li><t>The payload of at least 128 octets</t></li>
+          <li><t>The original frame length</t></li>
+          <li><t>Sampling rates down to 1:1 (i.e. every packet is replicated)</t></li>
+          <li><t>Having different sampling sessions having different sampling rates (to allow a "general" session to be watching a broad selection of traffic, and more specific sessions targeting exact flows or situations)</t></li>
+          <li><t>At least two sessions per physical interface</t></li>
+          <li><t>Filtering on ingress port</t></li>
+          <li><t>Filtering on action</t></li>
+          <li><t>Filtering on direction of traffic</t></li>
+        </ul>
+      </t>
+      <t>A Client SHOULD take efforts to be notified when a change has occurred on the Replicator, and re-verify its replication configurations when such a change is detected.</t>
+    </section>
     <section anchor="IANA" title="IANA Considerations">
       <t>This document defines a new UDP port number, entitled "Sampled Streaming", and assigns a value of TBD1 from the Service Name and Transport Protocol Port Number Registry https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml:</t>
       <texttable>
-        <ttcol>Tag</ttcol><ttcol>Description</ttcol>
-        <c>TBD1</c><c>Sampled Streaming</c>
+        <ttcol>Tag</ttcol>
+        <ttcol>Description</ttcol>
+        <c>TBD1</c>
+        <c>Sampled Streaming</c>
       </texttable>
-
-      <t>This document requests registration of a URI in the "IETF XML Registry" <xref target="RFC3688">RFC 3688</xref>.  Following the format in RFC 3688, the following registration is suggested:</t><figure><artwork><![CDATA[
+      <t>This document requests registration of a URI in the "IETF XML Registry" <xref target="RFC3688">RFC 3688</xref>.  Following the format in RFC 3688, the following registration is suggested:</t>
+      <figure>
+        <artwork>
+          <![CDATA[
 URI: urn:ietf:params:xml:ns:yang:ietf-sampled-streaming
 Registrant Contact: The IESG.
-XML: N/A, the requested URI is an XML namespace.]]></artwork></figure>
-      
-      <t>This document registers a YANG module in the "YANG Module Names" registry <xref target="RFC6020">RFC 6020</xref>:</t><figure><artwork><![CDATA[
+XML: N/A, the requested URI is an XML namespace.]]>
+        </artwork>
+      </figure>
+      <t>This document registers a YANG module in the "YANG Module Names" registry <xref target="RFC6020">RFC 6020</xref>:</t>
+      <figure>
+        <artwork>
+          <![CDATA[
 name: ietf-sampled-streaming
 namespace: urn:ietf:params:xml:ns:yang:ietf-sampled-streaming
 prefix: ss
-reference: This document]]></artwork></figure>
+reference: This document]]>
+        </artwork>
+      </figure>
     </section>
-
     <section anchor="Security" title="Security Considerations">
       <t>Vendors and deployments must take into consideration that this functionality allows a mirroring of traffic, with configurable destinations and filters.  Similar functionality already exists in various remote packet mirroring systems, and similar considerations should be taken.  Filters utilizing the source port of TBD1 SHOULD be applied at the edges of a provider's network to provide an additional layer of security.</t>
     </section>
-
     <section anchor="Acknowledgements" title="Acknowledgments">
       <t>The author would like to thank Joe Clarke, Brian Harber, Paolo Lucente, Jim Rampley, and Dmytro Shytyi for their reviews and providing helpful suggestions and feedback of this draft.</t>
     </section>
-
   </middle>
 
-  <!--  *****BACK MATTER ***** -->
 
   <back>
     <references title="Normative References">
-      <!--?rfc include="http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
       &RFC2119;
-   
-      <!--?rfc include="http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3688.xml"?-->
       &RFC3688;
-      
-      <!--?rfc include="http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6020.xml"?-->
       &RFC6020;
-
       &RFC8343;
     </references>
-
     <references title="Informative References">
-      <!-- Here we use entities that we defined at the beginning. -->
-      &PCAPNG;
+      &PCAPNG;    
     </references>
-
     <section anchor="YANG" title="Yang Model">
-      <figure><sourcecode type="yang">
-        <xi:include href="ietf-sampled-streaming@2019-10-22.yang" parse="text" />
-      </sourcecode></figure>
+      <figure>
+        <sourcecode type="yang">
+          <xi:include href="ietf-sampled-streaming@2019-10-22.yang" parse="text"/>
+        </sourcecode>
+      </figure>
     </section>
-
   </back>
 </rfc>
