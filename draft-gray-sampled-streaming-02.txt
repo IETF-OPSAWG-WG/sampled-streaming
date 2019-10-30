@@ -4,8 +4,8 @@
 
 Internet Engineering Task Force                             A. Gray, Ed.
 Internet-Draft                                    Charter Communications
-Intended status: Informational                           25 October 2019
-Expires: 27 April 2020
+Intended status: Informational                           30 October 2019
+Expires: 2 May 2020
 
 
                        Sampled Traffic Streaming
@@ -14,17 +14,18 @@ Expires: 27 April 2020
 Abstract
 
    This document standardizes the means of requesting a sampled capture
-   stream from a router, receiving details about the resulting data
-   flow, and the structure of the data flow itself.  This is
-   specifically tailored to having various hardware ASICs be able to
-   perform this operation as quickly as possible, by allowing
+   stream from any device generating, routing, or forwarding traffic,
+   receiving details about the resulting data flow, and the structure of
+   the data flow itself.  This is specifically tailored to having
+   various hardware ASICs, NPUs, or CPU-based capture software to be
+   able to perform this operation as quickly as possible, by allowing
    communication of the specific bit formats of headers applied to the
-   packet flow, in a way that enhances interoperability between sources
-   and sinks.  Historically, NetFlow and its ilk have been used for
-   these use cases, however the growth in hardware forward speeds is far
-   outpacing the growth in CPU speeds, and the CPU-heavy parts of
-   NetFlow is resulting in a reduction of sampling rates that include
-   all of the fields provided by NetFlow that require CPU lookups.
+   packet flow, in a way that enhances interoperability between traffic
+   sources and sinks.  Historically, NetFlow and its ilk have been used
+   for these use cases; however, the growth in hardware forwarding
+   speeds is far outpacing the growth in CPU speeds, and the CPU-heavy
+   parts of NetFlow results in the reduction of sampling rates, due to
+   the fields provided by NetFlow that require CPU lookups.
 
 Status of This Memo
 
@@ -41,23 +42,24 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 April 2020.
+   This Internet-Draft will expire on 2 May 2020.
 
 Copyright Notice
 
    Copyright (c) 2019 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
-   This document is subject to BCP 78 and the IETF Trust's Legal
-   Provisions Relating to IETF Documents (https://trustee.ietf.org/
 
 
 
-Gray                      Expires 27 April 2020                 [Page 1]
+
+Gray                       Expires 2 May 2020                   [Page 1]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
    license-info) in effect on the date of publication of this document.
    Please review these documents carefully, as they describe your rights
    and restrictions with respect to this document.  Code Components
@@ -77,14 +79,14 @@ Table of Contents
      2.4.  Use Case 4: Security Automation . . . . . . . . . . . . .   4
    3.  Stream Setup  . . . . . . . . . . . . . . . . . . . . . . . .   5
    4.  Data Stream Format  . . . . . . . . . . . . . . . . . . . . .   6
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
-   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  10
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
-   Appendix A.  Yang Model . . . . . . . . . . . . . . . . . . . . .  11
-   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  23
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
+   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  11
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .  11
+   Appendix A.  Yang Model . . . . . . . . . . . . . . . . . . . . .  12
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  24
 
 1.  Introduction
 
@@ -100,21 +102,22 @@ Table of Contents
 
       Client: The device configuring the Replicator.
 
-      Receiver: The device that will be receiving the packet stream.
+      Receiver: The device receiving the packet stream.
 
-      Replicator: The device doing the actual packet replication, as
-      requested by a Client, and sending it to a Receiver.
-
+      Replicator: The device performing the actual packet replication,
 
 
 
 
-Gray                      Expires 27 April 2020                 [Page 2]
+Gray                       Expires 2 May 2020                   [Page 2]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
-      Point: The location inside the Replicator (generally a forwarding
+      as requested by a Client, and sending the resulting replicated
+      packet stream to a Receiver.
+
+      Point: The location inside the Replicator (typically, a forwarding
       ASIC) that performs the actual packet replication.  There may be
       multiple physical interfaces serviced by one Point, or one
       interface may be serviced by multiple Points, that may have
@@ -122,70 +125,70 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
 
 2.  Problem Statement / Operator Use Cases
 
-   This document is designed around the following use cases that
-   operators have today, or can foresee coming on the near horizon.
+   This document is designed around the following current and forseeable
+   use cases that operators have today.
 
 2.1.  Use Case 1 : Traffic Analytics
 
-   At present, operators may use a mix of NetFlow, IPFIX, and inline
-   traffic samplers spread throughout the network to gather data for
-   analytics.  With the next generation of hardware on the horizon, we
-   have 400Gb/s interfaces starting to become available, with faster
-   speeds already being talked about.  This will require at least an
+   Operators typically use a mix of NetFlow, IPFIX, and inline traffic
+   samplers spread throughout the network to gather data for analytics.
+   With the next generation of hardware, 400Gb/s interfaces are becoming
+   available, with higher data rates under development in their
+   respective standards bodies.  This will require at least an
    augmentation of any inline traffic samplers, which are quite
    expensive.  Additionally, the pace of growth in the data plane is
-   outgrowing the pace of growth in the control plane.  This is
-   especially seen with relatively control plane or CPU heavy protocols
-   like NetFlow, where present sampling rates are simply not going to be
-   sustainable long-term, due to on-box control plane hardware
-   limitations.  Being able to capture a filtered, sampled collection of
-   actual packets throughout the network is very valuable for
-   understanding how the network is being used, to provide hard data to
-   justify network topology augments or changes.
+   outgrowing the pace of growth of the control plane.  This is
+   especially visible with relatively control plane or CPU-heavy
+   protocols such as NetFlow, where current sampling rates are simply
+   not going to be sustainable long-term, primarily due to on-box
+   control plane hardware limitations.  Being able to capture a
+   filtered, sampled collection of actual packets throughout the network
+   is very valuable for understanding how the network is being used, to
+   provide hard data to justify network topology augments and/or
+   technology changes.
 
    This proposal addresses this use case by making the data replication
    as simple as possible for hardware forwarding ASICs to implement and
    send off the device.  This allows offloading the heavy calculations
-   to distributed infrastructure than can be scaled as needed using
+   to distributed infrastructure than can be scaled on demand using
    commodity hardware.
 
 2.2.  Use Case 2 : Network Behavior Verification
 
-   This use case focuses on the potential ability to have the ASICs also
-   include packets that would normally be dropped, along with a reason
-   why.  With bits denoting dropped due to QoS policies, buffer
-   contention, ACLs, etc., this traffic could be captured (potentially
-   at a sampling rate of 1:1, i.e. every packet) and sent off for off-
-   box analysis to determine if this was expected, or to provide alerts
-   that QoS policies may be having adverse effects on the network.
-   Here, including the packet payload provides a lot of additional data
-   for these platforms to effectively "second guess" these policies.
+   This use case focuses on the potential ability to have the ASICs
+   stream discarded packets, along with an indication as to the reason
+   for the drop.  With bits denoting dropped due to QoS policies, buffer
+   contention, ACLs, etc., such discarded traffic could be streamed
+   (potentially at a sampling rate of 1:1, i.e. every packet) off-box
+   for analysis to determine if the observed behavior was expected, or
+   trigger alerts that QoS policies may be having adverse effects on the
 
 
 
-
-
-Gray                      Expires 27 April 2020                 [Page 3]
+Gray                       Expires 2 May 2020                   [Page 3]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+   network.  The ability to include the packet payload provides a lot of
+   additional information allowing examination of the platform behavior
+   and affected policies.
+
    This proposal addresses this use case by explicitly including a field
-   for marking what an ASIC is going to do with a packet, and including
-   the payload of the resulting sample.
+   for marking the ASIC's action for the packet and why, and including
+   the payload of the resulting sampled packet.
 
 2.3.  Use Case 3 : Standardization
 
-   These problems are foreseen by various vendors, who are talking about
-   different variants of these sorts of traffic flows.  Standardizing
-   the way these streams are formed and communicated between the
-   Replicators, Clients, and Receivers in a fashion that allows vendors
-   flexibility in what the ASIC has to do (by allowing communicating of
-   an extremely dynamic header in a manner than control planes can
-   manage) allows systems to be used between all compliant platforms.
-   The alternative is having to build independent systems for each form
-   of this sort of packet replication that may end up being developed,
-   resulting in much higher costs.
+   Standardizing the way these data streams are formed and communicated
+   between the Replicators, Clients, and Receivers in a fashion that
+   allows vendors flexibility in what work the ASIC has to do to support
+   sampled streaming (by allowing communicating of an extremely dynamic
+   header in a manner than control planes can manage) allows systems to
+   be used between all platforms in an interoperable fashion.  The
+   alternative is to build independent systems for each packet
+   replication solution that may end up being developed, resulting in
+   much higher costs for an overall solution.
 
    This proposal addresses this use case by allowing the packet header
    to contain any combination of information, in any position and of any
@@ -201,12 +204,12 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
    example, 1 in 20,000) for constant monitoring at various points
    throughout the network.  Upon seeing something it deems
    'interesting', or by manual input, it can add in an additional,
-   targeted, stream, at a very high sampling rate (potentionally 1 to 1)
+   targeted, stream, at a very high sampling rate (potentionally 1:1)
    for detailed analysis and mitigation efforts.
 
    Examples of past incidents where this may have been useful are the
    NTP MONLIST attacks, DNS attacks, or DDoS attacks (although 1:1 would
-   most likely not be used in a DDoS case, unless performing initial
+   most likely not be used in a DDoS case, unless performing the initial
    data collection).
 
    The security platform could potentially then use the collected
@@ -218,32 +221,30 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
 
-
-
-
-Gray                      Expires 27 April 2020                 [Page 4]
+Gray                       Expires 2 May 2020                   [Page 4]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
 3.  Stream Setup
 
-   To begin, a Client utilizes a supported configuration method
-   (NETCONF, RESTCONF, gRPC, etc.) and the YANG model listed in
-   Appendix A.  A Client must first request from the Replicator the
-   available configurations via the 'points' branch, which provides the
-   following information:
+   The Client utilizes a supported configuration method (NETCONF,
+   RESTCONF, gRPC, etc.) and the YANG model listed in Appendix A.  A
+   Client must first request from the Replicator the available
+   configurations via the 'points' branch, which provides the following
+   information:
 
    *  A name of the Point.
 
-   *  What interfaces this Point is servicing.
+   *  A list of interfaces this Point is servicing.
 
-   *  If filtering is available, and if so, what filters can be applied
-      (against certain IP fields, against parts of the frame, etc.)
+   *  An indication whether filtering is available, and if so, what
+      filters can be applied (for example, against certain IP fields,
+      against parts of the frame, etc.)
 
    *  Minimum and maximum sampling rates.
 
-   *  Any current samplers already active off this Point.
+   *  A list of any current samplers already active on this Point.
 
    *  Optionally, the maximum frame length the Point can replicate into
       the sample.
@@ -253,42 +254,45 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
    *  Optionally, the maximum number of samplers that this Point can
       accommodate.  A Client MUST still check for success, as highly
       complex filters may reduce the amount of replication the Point can
-      do from this maximum.
+      do from this stated maximum.
 
    The Client then can request one or more streams to be set up on the
-   Replicator, using that information.
+   Replicator, taking into consideration the provided information.
 
-   These individual streams may be configured with filters and a
+   A stream may be configured with zero, one, or more filters and a
    sampling rate, with the replicated packets sent to the Receiver,
    wrapped in an outer UDP header.  The available filters are provided
-   by the Replicator in the response above - a common option will be for
-   what interface specifically to filter traffic against.  The source
-   port of this UDP stream MUST be set to TBD1 by default - Replicators
-   MAY offer an ability to change this default.  This is to allow
-   security filters to have a fixed value to key off of as an additional
-   defense to prevent these streams from being inadvertently sent to
-   undesirable locations.
+   by the Replicator in the response above, with expected common options
+   being specific interfaces and direction.  A full listing of
+   envisioned filter options is provided in the YANG model, detailed
+   below, but a given Point MAY NOT implement or offer all of the
+   possibilities.
+
+   The source port in the UDP header of this stream MUST be set to TBD1
+   by default - Replicators MAY offer an ability to change this default.
+   This is to allow security filters to have a fixed value to key off of
+   as an additional defense to prevent these streams from being
+   inadvertently sent to undesirable locations.
+
+
+
+
+Gray                       Expires 2 May 2020                   [Page 5]
+
+Internet-Draft          Sampled Traffic Streaming           October 2019
+
 
    The Client and Receiver MAY be separate devices.  The mechanism of
    exchanging information between Client and Receiver about the setup
    process is outside the scope of this document.
 
-
-
-
-
-Gray                      Expires 27 April 2020                 [Page 5]
-
-Internet-Draft          Sampled Traffic Streaming           October 2019
-
-
 4.  Data Stream Format
 
-   After the stream setup, the Client MUST re-query the stream
-   configuration to get the stream-format data that the remote device
-   has calculated.  The Client MUST NOT assume that the stream-format
-   data is consistent between one stream setup and any other (there may
-   be different versions of ASICs, different capabilities, different
+   After the stream setup, the Client MUST re-query the Replicator to
+   get the resulting stream-format data that the Replicator has
+   calculated.  The Client MUST NOT assume that the stream-format data
+   is consistent between one stream setup and any other (there may be
+   different versions of ASICs, different capabilities, different
    versions of operating systems, or different filters may yield a
    different format), or that the Payload is always at the end (it could
    appear at the beginning or in the middle, and sufficient data is
@@ -305,13 +309,33 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
    length fields (as a single variable length can be deduced from the
    wrapper length).
 
+   This means there is no normative packet format or data layout - a
+   large point of this specification is to allow that packet format to
+   be negotiated and decided between the Client and Replicator, with the
+   information passed back via the stream-format data.
+
    One example of what the resulting packet may look like (but not a
-   nominative listing of what it is - the actual format can be any
+   normative listing of what it is - the actual format can be any
    combination of fields, of any size, in any order), the data inside
    the resulting data stream after the UDP tunnel header may look like
    the following:
 
-   Example layout 1:
+   Example 1: Packet layout
+
+
+
+
+
+
+
+
+
+
+
+
+Gray                       Expires 2 May 2020                   [Page 6]
+
+Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
     0                   1                   2                   3
@@ -328,53 +352,87 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
 
                                   Figure 1
 
-   This non-normative example would be listed in the modeled data for
-   packet-format as per the following table:
+   This non-normative example may be associated with a stream-format as
+   per the following table:
 
 
 
-Gray                      Expires 27 April 2020                 [Page 6]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gray                       Expires 2 May 2020                   [Page 7]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
-   +-----------+------+------------------------+----------------------+
-   | Name      | Size | Type                   | Type-Data            |
-   +===========+======+========================+======================+
-   | Incoming  | 8    | port-ingress           | A listing of values  |
-   | port      |      |                        | that may be seen in  |
-   |           |      |                        | this field, mapped   |
-   |           |      |                        | to interface-refs    |
-   |           |      |                        | from [RFC8343].      |
-   +-----------+------+------------------------+----------------------+
-   | Timestamp | 24   | timestamp-nsec-ingress | Two 32 bit numbers   |
-   |           |      |                        | giving when the "0"  |
-   |           |      |                        | of this field is     |
-   |           |      |                        | based off of, using  |
-   |           |      |                        | the PTP Truncated    |
-   |           |      |                        | Timestamp format.    |
-   +-----------+------+------------------------+----------------------+
-   | Act       | 2    | action                 | A listing of values  |
-   |           |      |                        | that may be seen in  |
-   |           |      |                        | this field, mapped   |
-   |           |      |                        | to action types      |
-   |           |      |                        | (accepted, dropped,  |
-   |           |      |                        | etc.)                |
-   +-----------+------+------------------------+----------------------+
-   | Frame     | 17   | frame-length-ingress   | Note that this       |
-   | Length    |      |                        | denotes the original |
-   |           |      |                        | frame length - the   |
-   |           |      |                        | payload field MAY    |
-   |           |      |                        | NOT include the      |
-   |           |      |                        | entire payload.      |
-   +-----------+------+------------------------+----------------------+
-   | Internal  | 13   | padding                |                      |
-   | Data 1    |      |                        |                      |
-   +-----------+------+------------------------+----------------------+
-   | Payload   | 0    | frame-payload-ingress  |                      |
-   +-----------+------+------------------------+----------------------+
+   +-----------+-------+------------------------+----------------------+
+   | Field     | Field | Field Type             | Field Type-Data      |
+   | Name      | Size  |                        |                      |
+   +===========+=======+========================+======================+
+   | Incoming  | 8     | port-ingress           | A listing of values  |
+   | port      |       |                        | that may be seen in  |
+   |           |       |                        | this field, mapped   |
+   |           |       |                        | to interface-refs    |
+   |           |       |                        | from [RFC8343].      |
+   +-----------+-------+------------------------+----------------------+
+   | Timestamp | 24    | timestamp-nsec-ingress | Two 32 bit numbers   |
+   |           |       |                        | giving when the "0"  |
+   |           |       |                        | of this field is     |
+   |           |       |                        | based off of, using  |
+   |           |       |                        | the PTP Truncated    |
+   |           |       |                        | Timestamp format.    |
+   +-----------+-------+------------------------+----------------------+
+   | Act       | 2     | action                 | A listing of values  |
+   |           |       |                        | that may be seen in  |
+   |           |       |                        | this field, mapped   |
+   |           |       |                        | to action types      |
+   |           |       |                        | (accepted, dropped,  |
+   |           |       |                        | etc.)                |
+   +-----------+-------+------------------------+----------------------+
+   | Frame     | 17    | frame-length-ingress   | Note that this       |
+   | Length    |       |                        | denotes the          |
+   |           |       |                        | original frame       |
+   |           |       |                        | length - the         |
+   |           |       |                        | payload field MAY    |
+   |           |       |                        | NOT include the      |
+   |           |       |                        | entire payload.      |
+   +-----------+-------+------------------------+----------------------+
+   | Internal  | 13    | padding                |                      |
+   | Data 1    |       |                        |                      |
+   +-----------+-------+------------------------+----------------------+
+   | Payload   | 0     | frame-payload-ingress  |                      |
+   +-----------+-------+------------------------+----------------------+
 
-                Table 1: Packet-format response example 1
+                   Table 1: Example 1: Stream-format data
 
    Another non-normative example, which is similar to the
    [I-D.tuexen-opsawg-pcapng] enhanced packet block (EPB) format (and
@@ -387,46 +445,45 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
 
-
-
-Gray                      Expires 27 April 2020                 [Page 7]
+Gray                       Expires 2 May 2020                   [Page 8]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
-   +-----------+------+--------------------+---------------------------+
-   | Name      | Size | Type               | Type-Data                 |
-   +===========+======+====================+===========================+
-   | Interface | 32   | port               | A listing of values       |
-   | ID        |      |                    | that may be seen in       |
-   |           |      |                    | this field, mapped        |
-   |           |      |                    | to interface-refs         |
-   |           |      |                    | from [RFC8343].           |
-   +-----------+------+--------------------+---------------------------+
-   | Timestamp | 64   | timestamp-msec     | Two 32 bit numbers        |
-   |           |      |                    | giving when the "0"       |
-   |           |      |                    | of this field is          |
-   |           |      |                    | based off of, using       |
-   |           |      |                    | the PTP Truncated         |
-   |           |      |                    | Timestamp format.         |
-   +-----------+------+--------------------+---------------------------+
-   | Captured  | 32   | frame-payload-size | Note: This allows         |
-   | Packet    |      |                    | us to have the            |
-   | Length    |      |                    | Options field as          |
-   |           |      |                    | our real variable         |
-   |           |      |                    | length field.             |
-   +-----------+------+--------------------+---------------------------+
-   | Original  | 32   | frame-length       |                           |
-   | Packet    |      |                    |                           |
-   | Length    |      |                    |                           |
-   +-----------+------+--------------------+---------------------------+
-   | Packet    | 0    | frame-payload      |                           |
-   | Data      |      |                    |                           |
-   +-----------+------+--------------------+---------------------------+
-   | Options   | 0    | padding            |                           |
-   +-----------+------+--------------------+---------------------------+
+     +-----------+-------+--------------------+---------------------+
+     | Field     | Field | Field Type         | Field Type-Data     |
+     | Name      | Size  |                    |                     |
+     +===========+=======+====================+=====================+
+     | Interface | 32    | port               | A listing of values |
+     | ID        |       |                    | that may be seen in |
+     |           |       |                    | this field, mapped  |
+     |           |       |                    | to interface-refs   |
+     |           |       |                    | from [RFC8343].     |
+     +-----------+-------+--------------------+---------------------+
+     | Timestamp | 64    | timestamp-msec     | Two 32 bit numbers  |
+     |           |       |                    | giving when the "0" |
+     |           |       |                    | of this field is    |
+     |           |       |                    | based off of, using |
+     |           |       |                    | the PTP Truncated   |
+     |           |       |                    | Timestamp format.   |
+     +-----------+-------+--------------------+---------------------+
+     | Captured  | 32    | frame-payload-size | Note: This allows   |
+     | Packet    |       |                    | us to have the      |
+     | Length    |       |                    | Options field as    |
+     |           |       |                    | our real variable   |
+     |           |       |                    | length field.       |
+     +-----------+-------+--------------------+---------------------+
+     | Original  | 32    | frame-length       |                     |
+     | Packet    |       |                    |                     |
+     | Length    |       |                    |                     |
+     +-----------+-------+--------------------+---------------------+
+     | Packet    | 0     | frame-payload      |                     |
+     | Data      |       |                    |                     |
+     +-----------+-------+--------------------+---------------------+
+     | Options   | 0     | padding            |                     |
+     +-----------+-------+--------------------+---------------------+
 
-                 Table 2: Packet-format response example 2
+                Table 2: Packet-format response example 2
 
    To restate the prior note, the above is purely an example of what the
    format could be - the actual format used is negotiated between the
@@ -441,16 +498,18 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
 
    *  The payload of at least 128 octets
 
-   *  The original frame length
 
 
 
-Gray                      Expires 27 April 2020                 [Page 8]
+Gray                       Expires 2 May 2020                   [Page 9]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
-   *  Sampling rates down to 1:1 (i.e. every packet is replicated)
+   *  The original frame length
+
+   *  Sampling rates up to 1:1 (i.e. every packet is replicated), and
+      down to 1:20000 or smaller.
 
    *  Having different sampling sessions having different sampling rates
       (to allow a "general" session to be watching a broad selection of
@@ -494,16 +553,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
    Registrant Contact: The IESG.
    XML: N/A, the requested URI is an XML namespace.
 
-   This document registers a YANG module in the "YANG Module Names"
-   registry RFC 6020 [RFC6020]:
 
 
 
 
-
-Gray                      Expires 27 April 2020                 [Page 9]
+Gray                       Expires 2 May 2020                  [Page 10]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
+
+
+   This document registers a YANG module in the "YANG Module Names"
+   registry RFC 6020 [RFC6020]:
 
 
    name: ietf-sampled-streaming
@@ -523,9 +583,9 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
 
 7.  Acknowledgments
 
-   The author would like to thank Joe Clarke, Brian Harber, Paolo
-   Lucente, Jim Rampley, and Dmytro Shytyi for their reviews and
-   providing helpful suggestions and feedback of this draft.
+   The author would like to thank Joe Clarke, Marek Hajduczenia, Brian
+   Harber, Paolo Lucente, Jim Rampley, and Dmytro Shytyi for their
+   reviews and providing helpful suggestions and feedback of this draft.
 
 8.  References
 
@@ -551,17 +611,16 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
 
 8.2.  Informative References
 
-   [I-D.tuexen-opsawg-pcapng]
-              Tuexen, M., Risso, F., Bongertz, J., and G. Harris, "PCAP
-              Next Generation (PCAPNG) Dump File Format", Work in
 
 
-
-Gray                      Expires 27 April 2020                [Page 10]
+Gray                       Expires 2 May 2020                  [Page 11]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+   [I-D.tuexen-opsawg-pcapng]
+              Tuexen, M., Risso, F., Bongertz, J., and G. Harris, "PCAP
+              Next Generation (PCAPNG) Dump File Format", Work in
               Progress, Internet-Draft, draft-tuexen-opsawg-pcapng-00,
               26 June 2014, <http://www.ietf.org/internet-drafts/draft-
               tuexen-opsawg-pcapng-00.txt>.
@@ -607,16 +666,16 @@ Appendix A.  Yang Model
         The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
         NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
         'MAY', and 'OPTIONAL' in this document are to be interpreted as
-        described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
-        they appear in all capitals, as shown here.";
 
 
 
-
-Gray                      Expires 27 April 2020                [Page 11]
+Gray                       Expires 2 May 2020                  [Page 12]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
+
+        described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
+        they appear in all capitals, as shown here.";
 
      revision 2019-10-22 {
        description
@@ -663,17 +722,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
            }
            enum ip-v4-dstip {
              description "The IPv4 header's destination IPv4 address.";
-           }
-         enum ip-v4-ttl {
-           description "The IPv4 header's Time to Live.";
 
 
 
-Gray                      Expires 27 April 2020                [Page 12]
+Gray                       Expires 2 May 2020                  [Page 13]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+           }
+         enum ip-v4-ttl {
+           description "The IPv4 header's Time to Live.";
          }
          enum ip-v4-prot {
            description "The IPv4 header's protocol number.";
@@ -719,17 +778,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
          }
          enum port-egress {
            description "What port the traffic is leaving on (may be
-            different than 'port')";
-         }
-         enum timestamp-msec-ingress {
 
 
 
-Gray                      Expires 27 April 2020                [Page 13]
+Gray                       Expires 2 May 2020                  [Page 14]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+            different than 'port')";
+         }
+         enum timestamp-msec-ingress {
            description "The timestamp the packet was received at, in
             integer milliseconds.  The epoch of this number is provided in
              the timestamp container of the returned field information.";
@@ -775,17 +834,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
             MAY NOT be the same as the captured packet length.";
          }
          enum frame-payload-size {
-           description "The length of the payload that has actually been
-            copied into this stream.";
-         }
 
 
 
-Gray                      Expires 27 April 2020                [Page 14]
+Gray                       Expires 2 May 2020                  [Page 15]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+           description "The length of the payload that has actually been
+            copied into this stream.";
+         }
          enum frame-payload-ingress {
            description "The payload of the frame, as received the point.";
          }
@@ -831,17 +890,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
            description "Forwarded with additional outer wrapper due to
             fast reroute.";
          }
-         enum dropped {
-           description "Generically dropped.  A more specific action type
-            code SHOULD be used.";
 
 
 
-Gray                      Expires 27 April 2020                [Page 15]
+Gray                       Expires 2 May 2020                  [Page 16]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+         enum dropped {
+           description "Generically dropped.  A more specific action type
+            code SHOULD be used.";
          }
          enum dropped-rate-limit {
            description "Dropped due to a rate limiter applied.";
@@ -887,16 +946,16 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
            description "Capture both ingress and egress traffic.";
          }
        }
-       description "Different possible direction types.";
-     }
 
 
 
-
-Gray                      Expires 27 April 2020                [Page 16]
+Gray                       Expires 2 May 2020                  [Page 17]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
+
+       description "Different possible direction types.";
+     }
 
      list points {
        description "A listing of the capture points available on this
@@ -943,17 +1002,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
        }
        leaf max-samplers {
          type uint32;
-         description "The maximum number of samplers that can be installed
-          at this point.";
-       }
 
 
 
-Gray                      Expires 27 April 2020                [Page 17]
+Gray                       Expires 2 May 2020                  [Page 18]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+         description "The maximum number of samplers that can be installed
+          at this point.";
+       }
        leaf max-filters {
          type uint32;
          description "The maximum number of filtering rules permitted at
@@ -999,17 +1058,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
                type inet:ip-address-no-zone;
                description "The destination IP to send the stream to.";
              }
-             leaf destination-port {
-               mandatory true;
-               type inet:port-number;
 
 
 
-Gray                      Expires 27 April 2020                [Page 18]
+Gray                       Expires 2 May 2020                  [Page 19]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+             leaf destination-port {
+               mandatory true;
+               type inet:port-number;
                description "The destination UDP port number to send the
                 stream to.";
              }
@@ -1055,17 +1114,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
              }
            }
 
-           list directions {
-             when "../type = 'direction'";
-             description "Which direction(s) to sample traffic in.";
 
 
 
-Gray                      Expires 27 April 2020                [Page 19]
+Gray                       Expires 2 May 2020                  [Page 20]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+           list directions {
+             when "../type = 'direction'";
+             description "Which direction(s) to sample traffic in.";
              key "direction";
              leaf direction {
                description "Specific direction code.";
@@ -1112,16 +1171,15 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
              }
            }
 
-           leaf frame-length {
-             when "../type = 'frame-length'";
 
 
-
-Gray                      Expires 27 April 2020                [Page 20]
+Gray                       Expires 2 May 2020                  [Page 21]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+           leaf frame-length {
+             when "../type = 'frame-length'";
              type uint16;
              description "Frame length to match on.";
            }
@@ -1168,15 +1226,16 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
                leaf meaning {
                  type action-type;
                  description "What this value indicates.";
-               }
-             }
 
 
 
-Gray                      Expires 27 April 2020                [Page 21]
+Gray                       Expires 2 May 2020                  [Page 22]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
+
+               }
+             }
 
              list port-mappings {
                description "The mapping of values to interfaces, valid for
@@ -1223,17 +1282,17 @@ Internet-Draft          Sampled Traffic Streaming           October 2019
                }
                leaf nanoseconds {
                  type uint32;
-                 description "Specifies the fractional portion of the number
-                  of seconds since the epoch, in integer number of nanoseconds.";
-               }
 
 
 
-Gray                      Expires 27 April 2020                [Page 22]
+Gray                       Expires 2 May 2020                  [Page 23]
 
 Internet-Draft          Sampled Traffic Streaming           October 2019
 
 
+                 description "Specifies the fractional portion of the number
+                  of seconds since the epoch, in integer number of nanoseconds.";
+               }
              }
            }
          }
@@ -1282,7 +1341,4 @@ Author's Address
 
 
 
-
-
-
-Gray                      Expires 27 April 2020                [Page 23]
+Gray                       Expires 2 May 2020                  [Page 24]
