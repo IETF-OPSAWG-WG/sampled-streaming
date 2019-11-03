@@ -1,21 +1,19 @@
 module ietf-sampled-streaming {
   namespace "urn:ietf:params:xml:ns:yang:ietf-sampled-streaming";
-  prefix "ss";
-  
+  prefix ss;
+
   import ietf-interfaces {
     prefix if;
   }
   import ietf-inet-types {
     prefix inet;
   }
-  
+
   organization
     "IETF Working Group";
-    
   contact
     "Editor:    Andrew Gray
-               <mailto:Andrew.Gray@charter.com>";
- 
+     <mailto:Andrew.Gray@charter.com>";
   description
     "This module contains a collection of YANG definitions for
      managing sampled streaming subscriptions.
@@ -38,539 +36,831 @@ module ietf-sampled-streaming {
      NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
      'MAY', and 'OPTIONAL' in this document are to be interpreted as
      described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
-     they appear in all capitals, as shown here.";     
+     they appear in all capitals, as shown here.";
 
   revision 2019-10-22 {
-    description 
-      "Updates based on feedback for -02 draft: Adding more forwarded 
-      action-types.  frame-payload changed to be explicit about 
-      direction.  Added -size types explicitly for frame-payload and
-      padding to allow using more than one zero-length field.";
+    description
+      "Updates based on feedback for -02 draft: Adding more forwarded
+       action-types.  frame-payload changed to be explicit about
+       direction.  Added -size types explicitly for frame-payload and
+       padding to allow using more than one zero-length field.";
     reference
       "draft-gray-sampled-streaming-02";
   }
-
   revision 2019-08-06 {
-    description 
+    description
       "Updates based on feedback for -01 draft.";
     reference
       "draft-gray-sampled-streaming-01";
   }
-
   revision 2019-06-25 {
     description
       "Initial version.";
     reference
       "draft-gray-sampled-streaming-00";
   }
-  
+
   typedef filter-type {
     type enumeration {
       enum interfaces {
-        description "List of interfaces to filter against.";
+        description
+          "List of interfaces to filter against.";
       }
       enum action {
-        description "Filter against a list of actions that the Point 
-        took (i.e., only consider packets that were actually 
-        forwarded).";
+        description
+          "Filter against a list of actions that the Point took (i.e.,
+           only consider packets that were actually forwarded).";
       }
       enum direction {
-        description "Direction to sample traffic in.";
+        description
+          "Direction to sample traffic in.";
       }
-    	enum ip-version {
-    	  description "The version number in the IP header.";
-    	}
-    	enum ip-v4-srcip {
-    	  description "The IPv4 header's source IPv4 address.";
-    	}
-    	enum ip-v4-dstip {
-    	  description "The IPv4 header's destination IPv4 address.";
-    	}
+      enum ip-version {
+        description
+          "The version number in the IP header.";
+      }
+      enum ip-v4-srcip {
+        description
+          "The IPv4 header's source IPv4 address.";
+      }
+      enum ip-v4-dstip {
+        description
+          "The IPv4 header's destination IPv4 address.";
+      }
       enum ip-v4-ttl {
-        description "The IPv4 header's Time to Live.";
+        description
+          "The IPv4 header's Time to Live.";
       }
       enum ip-v4-prot {
-        description "The IPv4 header's protocol number.";
+        description
+          "The IPv4 header's protocol number.";
       }
       enum ip-v6-srcip {
-        description "The IPv6 header's source IPv4 address.";
+        description
+          "The IPv6 header's source IPv4 address.";
       }
       enum ip-v6-dstip {
-        description "The IPv6 header's destination IPv4 address.";
-      }      
+        description
+          "The IPv6 header's destination IPv4 address.";
+      }
       enum frame-size {
-        description "The total size of the frame.";
+        description
+          "The total size of the frame.";
       }
       enum frame-payload {
-        description "Specific payload octets.";
+        description
+          "Specific payload octets.";
       }
       enum frame-length {
-        description "Specific frame length.";
+        description
+          "Specific frame length.";
       }
     }
-    description "The filtering abilities available.";
+    description
+      "The filtering abilities available.";
   }
 
   typedef field-type {
     type enumeration {
       enum padding {
-        description "Padding bits that MUST be ignored.";
+        description
+          "Padding bits that MUST be ignored.";
       }
       enum padding-size {
-        description "This packet's length of a variable-length padding
-         field.";
+        description
+          "This packet's length of a variable-length padding field.";
       }
       enum port {
-        description "An indication of the port the traffic was sampled
-         from.";
+        description
+          "An indication of the port the traffic was sampled from.";
       }
       enum direction {
-        description "Which direction the traffic went.";
+        description
+          "Which direction the traffic went.";
       }
       enum port-ingress {
-        description "What port the traffic was received from (may be
-         different than 'port')";
+        description
+          "What port the traffic was received from (may be different
+           than 'port')";
       }
       enum port-egress {
-        description "What port the traffic is leaving on (may be
-         different than 'port')";
+        description
+          "What port the traffic is leaving on (may be different than
+           'port')";
       }
       enum timestamp-msec-ingress {
-        description "The timestamp the packet was received at, in
-         integer milliseconds.  The epoch of this number is provided in
-          the timestamp container of the returned field information.";
+        description
+          "The timestamp the packet was received at, in integer
+           milliseconds.  The epoch of this number is provided in the
+           timestamp container of the returned field information.";
       }
       enum timestamp-usec-ingress {
-        description "The timestamp the packet was received at, in
-         integer microseconds.  The epoch of this number is provided in
-          the timestamp container of the returned field information.";
-      }      
+        description
+          "The timestamp the packet was received at, in integer
+           microseconds.  The epoch of this number is provided in the
+           timestamp container of the returned field information.";
+      }
       enum timestamp-nsec-ingress {
-        description "The timestamp the packet was received at, in
-         integer nanoseconds.  The epoch of this number is provided in
-          the timestamp container of the returned field information.";
+        description
+          "The timestamp the packet was received at, in integer
+           nanoseconds.  The epoch of this number is provided in the
+           timestamp container of the returned field information.";
       }
       enum timestamp-msec-egress {
-        description "The timestamp the packet left the point at, in
-         integer milliseconds.  The epoch of this number is provided in
-          the timestamp container of the returned field information.";
+        description
+          "The timestamp the packet left the point at, in integer
+           milliseconds.  The epoch of this number is provided in the
+           timestamp container of the returned field information.";
       }
       enum timestamp-usec-egress {
-        description "The timestamp the packet left the point at, in
-         integer microseconds.  The epoch of this number is provided in
-         the timestamp container of the returned field information.";
-      }      
+        description
+          "The timestamp the packet left the point at, in integer
+           microseconds.  The epoch of this number is provided in the
+           timestamp container of the returned field information.";
+      }
       enum timestamp-nsec-egress {
-        description "The timestamp the packet left the point at, in
-         integer nanoseconds.  The epoch of this number is provided in
-         the timestamp container of the returned field information.";
+        description
+          "The timestamp the packet left the point at, in integer
+           nanoseconds.  The epoch of this number is provided in the
+           timestamp container of the returned field information.";
       }
       enum frame-length {
-        description "The generic frame length.  Note that due to 
-         chipset capabilities, this MAY NOT be the same as the captured
-         packet length.";
-      }      
+        description
+          "The generic frame length.  Note that due to chipset
+           capabilities, this MAY NOT be the same as the captured packet
+           length.";
+      }
       enum frame-length-ingress {
-        description "The frame length as received by the point.  Note
-         that due to chipset capabilities, this MAY NOT be the same as
-         the captured packet length.";
+        description
+          "The frame length as received by the point.  Note that due to
+           chipset capabilities, this MAY NOT be the same as the
+           captured packet length.";
       }
       enum frame-length-egress {
-        description "The frame length after local processing, as it
-         leaves the point.  Note that due to chipset capabilities, this
-         MAY NOT be the same as the captured packet length.";
+        description
+          "The frame length after local processing, as it leaves the
+           point.  Note that due to chipset capabilities, this MAY NOT
+           be the same as the captured packet length.";
       }
       enum frame-payload-size {
-        description "The length of the payload that has actually been
-         copied into this stream.";
+        description
+          "The length of the payload that has actually been copied into
+           this stream.";
       }
       enum frame-payload-ingress {
-        description "The payload of the frame, as received the point.";
+        description
+          "The payload of the frame, as received the point.";
       }
       enum frame-payload-egress {
-        description "The payload of the frame, as it leaves the point.";
+        description
+          "The payload of the frame, as it leaves the point.";
       }
       enum action {
-        description "The action that was taken on this frame.  Values
-         are mapped as according to action-type.";
+        description
+          "The action that was taken on this frame.  Values are mapped
+           as according to action-type.";
       }
     }
-    description "Types of data included in the data stream provided
-     back to the receiver.  Note that all fields MAY NOT be provided.";
+    description
+      "Types of data included in the data stream provided back to the
+       receiver.  Note that all fields MAY NOT be provided.";
   }
 
   typedef action-type {
     type enumeration {
       enum forwarded {
-        description "Generically forwarded normally through the system.
-         A more specific action type code SHOULD be used.";
+        description
+          "Generically forwarded normally through the system.  A more
+           specific action type code SHOULD be used.";
       }
       enum forwarded-label-change {
-        description "Forwarded, with a generic MPLS label change having
-         occurred.";
+        description
+          "Forwarded, with a generic MPLS label change having
+           occurred.";
       }
       enum forwarded-label-swap {
-        description "Forwarded, with a MPLS label swap.";
+        description
+          "Forwarded, with a MPLS label swap.";
       }
       enum forwarded-label-pop {
-        description "Forwarded, with a MPLS label pop.";
+        description
+          "Forwarded, with a MPLS label pop.";
       }
       enum forwarded-label-push {
-        description "Forwarded, with a MPLS label push.";
+        description
+          "Forwarded, with a MPLS label push.";
       }
       enum forwarded-cpu-punt {
-        description "Forwarded after a CPU punt.";
+        description
+          "Forwarded after a CPU punt.";
       }
       enum forwarded-tunnel {
-        description "Forwarded with additional outer wrapper for
-         tunneling.";
+        description
+          "Forwarded with additional outer wrapper for tunneling.";
       }
       enum forwarded-tunnel-frr {
-        description "Forwarded with additional outer wrapper due to
-         fast reroute.";
+        description
+          "Forwarded with additional outer wrapper due to fast
+           reroute.";
       }
       enum dropped {
-        description "Generically dropped.  A more specific action type
-         code SHOULD be used.";
+        description
+          "Generically dropped.  A more specific action type code SHOULD
+           be used.";
       }
       enum dropped-rate-limit {
-        description "Dropped due to a rate limiter applied.";
+        description
+          "Dropped due to a rate limiter applied.";
       }
       enum dropped-buffer {
-        description "Dropped due to no buffer space.";
+        description
+          "Dropped due to no buffer space.";
       }
       enum dropped-security {
-        description "Dropped due to a security policy.";
+        description
+          "Dropped due to a security policy.";
       }
       enum dropped-error {
-        description "Dropped due to the frame being in error.";
+        description
+          "Dropped due to the frame being in error.";
       }
       enum dropped-cpu-punt {
-        description "Dropped after a CPU punt.";
+        description
+          "Dropped after a CPU punt.";
       }
       enum passed-to-cpu {
-        description "Passed on to the CPU, but what the CPU did with it
-         is unknown.";
+        description
+          "Passed on to the CPU, but what the CPU did with it is
+           unknown.";
       }
     }
-    description "Possible actions taken on a packet.";
+    description
+      "Possible actions taken on a packet.";
   }
 
   typedef destination-type {
     type enumeration {
       enum udp {
-        description "Sent with a UDP header.";
+        description
+          "Sent with a UDP header.";
       }
     }
-    description "Different possible destination types.";
+    description
+      "Different possible destination types.";
   }
 
   typedef direction-type {
     type enumeration {
       enum ingress {
-        description "Traffic flowing into the Replicator.";
+        description
+          "Traffic flowing into the Replicator.";
       }
       enum egress {
-        description "Traffic flowing out of the Replicator.";
+        description
+          "Traffic flowing out of the Replicator.";
       }
       enum both {
-        description "Capture both ingress and egress traffic.";
+        description
+          "Capture both ingress and egress traffic.";
       }
     }
-    description "Different possible direction types.";
+    description
+      "Different possible direction types.";
   }
-    
-  list points {
-    description "A listing of the capture points available on this
-     device, what ports they provide for, and what filtering is
-      available at those points.";
-    key name;
+
+  typedef status-type {
+    type enumeration {
+      enum client-request-complete {
+        description
+          "The Client has completed its request setup.";
+      }
+      enum replicator-proposals-available {
+        description
+          "The Replicator has finished processing the request, and has
+           proposals available in the 'proposals' branch.";
+      }
+      enum replicator-proposal-error {
+        description
+          "The Replicator encountered an error attempting to come up
+           with a proposal.  'proposal-error' MAY contain an
+           explanation.";
+      }
+      enum client-proposal-selected {
+        description
+          "The Client has updated 'proposal-selected' and is ready for
+           the Replicator to install the requested sampling.";
+      }
+      enum replicator-install-success {
+        description
+          "The Replicator has successfully activated the sampling, and
+           it is operating.";
+      }
+      enum replicator-install-error {
+        description
+          "The Replicator encountered an error installing the sampling.
+           'install-error' MAY contain an explanation.";
+      }
+    }
+    description
+      "The status of a sampler entry.";
+  }
+
+  typedef frame-headers {
+    type bits {
+      bit eth-l1-preamble {
+        position 0;
+        description
+          "Will include the Ethernet preamble.";
+      }
+      bit eth-l1-sof {
+        position 1;
+        description
+          "Will include the Ethernet start of frame
+           delimiter";
+      }
+      bit eth-l2-dmac {
+        position 2;
+        description
+          "Will include the outer Ethernet destination MAC.";
+      }
+      bit eth-l2-smac {
+        position 3;
+        description
+          "Will include the outer Ethernet source MAC.";
+      }
+      bit eth-l2-ovlan {
+        position 4;
+        description
+          "Will include any outer 802.1Q VLAN tag.";
+      }
+      bit eth-l2-ivlan {
+        position 5;
+        description
+          "Will include any inner 802.1ad QinQ VLAN tag.";
+      }
+      bit eth-l2-type {
+        position 6;
+        description
+          "Will include the Ethertype or size.";
+      }
+      bit eth-l2-fcs {
+        position 7;
+        description
+          "Will include the Frame Check Sequence after the
+           payload.";
+      }
+      bit eth-l1-ipg {
+        position 8;
+        description
+          "Will include the 12 octet inter-packet gap.";
+      }
+      bit mpls-tags {
+        position 9;
+        description
+          "Will include MPLS tags.";
+      }
+    }
+    description
+      "Listing of fields to be provided in a frame capture.";
+  }
+
+  grouping filters {
+    description
+      "Filter definition.  Multiple filters are ANDed.";
     leaf name {
       type string;
-      description "The name of this capture point.";
+      description
+        "A name for this filter.";
     }
-    list interface {
-      description "List of interfaces that are available at this
-       point.";
-      config false;
-	  	leaf if {
-        mandatory true;
+    list interfaces {
+      when "../type = 'interfaces'";
+      key "int";
+      description
+        "Filter down to only this list of interfaces.";
+      leaf int {
         type if:interface-ref;
-        description "An interface tied to this capture point.";
-		  }
-	  }
-    list filters {
-      description "List of filtering options available at this
-       point.";
+        description
+          "A specific interface to filter against.";
+      }
+    }
+    list actions {
+      when "../type = 'action'";
+      key "action";
+      description
+        "Filter down to only this list of actions.";
+      leaf action {
+        type action-type;
+        description
+          "One specific action code.";
+      }
+    }
+    list directions {
+      when "../type = 'direction'";
+      key "direction";
+      description
+        "Which direction(s) to sample traffic in.";
+      leaf direction {
+        type direction-type;
+        description
+          "Specific direction code.";
+      }
+    }
+    leaf type {
+      type filter-type;
+      mandatory true;
+      description
+        "The type of filter associated.";
+    }
+    leaf ipv4-address {
+      when "../type = 'ip-v4-srcip' | ../type = 'ip-v4-dstip'";
+      type inet:ipv4-address-no-zone;
+      description
+        "The IPv4 address to filter on.";
+    }
+    leaf ipv6-address {
+      when "../type = 'ip-v6-srcip' | ../type = 'ip-v6-dstip'";
+      type inet:ipv6-address-no-zone;
+      description
+        "The IPv6 address to filter on.";
+    }
+    leaf version {
+      when "../type = 'ip-version'";
+      type inet:ip-version;
+      description
+        "The value of the IP version number to match on.";
+    }
+    container frame-payload {
+      when "../type = 'frame-payload'";
+      description
+        "Frame payload fragment to match on.";
+      leaf offset {
+        type uint16;
+        description
+          "Offset in octets from the start of the frame to begin the
+           match on.";
+      }
+      leaf match {
+        type binary;
+        description
+          "The bytes to match on.";
+      }
+    }
+    leaf frame-length {
+      when "../type = 'frame-length'";
+      type uint16;
+      description
+        "Frame length to match on.";
+    }
+  }
+
+  grouping stream-format {
+    description
+      "This contains the packet format data that this sampling stream is
+       sending.  This is only valid after configuration.  The length
+       fields are given in bits, and are consecutive.  Needed gaps
+       should use a 'padding' element.";
+    list fields {
+      key "name";
+      description
+        "The listing of the fields that will be encapsulated and sent to
+         the receiver.";
+      leaf name {
+        type string;
+        description
+          "Human readable name of what this field contains.";
+      }
+      leaf size {
+        type uint32 {
+          range "0..524280";
+        }
+        description
+          "The size of this field, in bits.  The value of '0' denotes a
+           variable-sized field.";
+      }
+      leaf type {
+        type field-type;
+        description
+          "The type of this data.";
+      }
+      list action-mappings {
+        when "../type='action'";
+        key "value";
+        description
+          "The mapping of values to action-type codes, valid for
+           type=action.";
+        leaf value {
+          type binary;
+          description
+            "The value that will appear in the header.";
+        }
+        leaf meaning {
+          type action-type;
+          description
+            "What this value indicates.";
+        }
+      }
+      list port-mappings {
+        when "../type='ingress-port' | ../type='egress-port'";
+        key "value";
+        description
+          "The mapping of values to interfaces, valid for
+           type=ingress-port or type=egress-port";
+        leaf value {
+          type binary;
+          description
+            "The value that will appear in the header.";
+        }
+        leaf port {
+          type if:interface-ref;
+          description
+            "The port the value maps to.";
+        }
+      }
+      list direction-mappings {
+        when "../type='direction'";
+        key "value";
+        description
+          "The mapping of values to direction codes, valid for
+           type=direction.";
+        leaf value {
+          type binary;
+          description
+            "The value that will appear in the header.";
+        }
+        leaf direction {
+          type direction-type;
+          description
+            "The direction the traffic in respect to the port.";
+        }
+      }
+      container timestamp {
+        when "../type='timestamp-nsec' | ../type='timestamp-usec' |
+              ../type='timestamp-msec'";
+        description
+          "Supplemental data for type=timestamp*, in PTP Truncated
+           Timestamp Format.  Provides the time used as the epoch for
+           the number in the data stream.";
+        leaf seconds {
+          type uint32;
+          description
+            "Specifies the integer portion of the number of seconds
+             since the epoch.";
+        }
+        leaf nanoseconds {
+          type uint32;
+          description
+            "Specifies the fractional portion of the number of seconds
+             since the epoch, in integer number of nanoseconds.";
+        }
+      }
+      leaf payload-contents {
+        when "../type='frame-payload-ingress' |
+              ../type='frame-payload-egress'";
+        type frame-headers;
+        description
+          "Details about what parts of the frame this payload field
+           SHOULD contain.  Note carefully the 'SHOULD' - for a variety
+           of reasons (different forwarding paths, exception handling,
+           etc.), the actual headers of any one frame MAY be different
+           than this.";
+      }
+    }
+  }
+
+  list points {
+    key "name";
+    description
+      "A listing of the capture points available on this device, what
+       ports they provide for, and what filtering is available at those
+       points.";
+    leaf name {
+      type string;
+      description
+        "The name of this capture point.";
+    }
+    list interfaces {
       config false;
-      leaf filter {
-        description "One specific filter available at this point.";
+      description
+        "List of interfaces that are available at this point.";
+      leaf if {
+        type if:interface-ref;
         mandatory true;
+        description
+          "An interface tied to this capture point.";
+      }
+    }
+    list filters {
+      config false;
+      description
+        "List of filtering options available at this point.";
+      leaf filter {
         type filter-type;
+        mandatory true;
+        description
+          "One specific filter available at this point.";
       }
     }
     leaf min-ratio {
       type uint32 {
         range "1..max";
       }
-      description "The minimum sampling ratio (1:N, with N being this
-       value) this point can provide.";
+      config false;
+      mandatory true;
+      description
+        "The minimum sampling ratio (1:N, with N being this value) this
+         point can provide.";
     }
     leaf max-ratio {
       type uint32 {
         range "1..max";
       }
-      description "The maximum sampling ratio (1:N, with N being this
-       value) this point can provide.";
+      config false;
+      mandatory true;
+      description
+        "The maximum sampling ratio (1:N, with N being this value) this
+         point can provide.";
     }
     leaf max-samplers {
       type uint32;
-      description "The maximum number of samplers that can be installed
-       at this point.";
+      config false;
+      description
+        "The maximum number of additional samplers that can be installed
+         at this point.";
     }
     leaf max-filters {
       type uint32;
-      description "The maximum number of filtering rules permitted at
-       this location.  Note this is an absolute maximum, and fewer
-        rules that are complex may still be rejected by the device.";
+      config false;
+      description
+        "The maximum number of filtering rules permitted at this
+         location.  Note this is an absolute maximum, and fewer rules
+         that are complex may still be rejected by the device.";
     }
     leaf max-frame-length-copy {
       type uint16;
-      description "The maximum size that the point can replicate and
-       copy into the header.";
+      config false;
+      description
+        "The maximum size that the point can replicate and copy into the
+         header.";
     }
     leaf max-frame-depth-inspect {
       type uint16;
-      description "The offset of the last octet in a frame the ASIC can
-       perform filtering against.";
+      config false;
+      description
+        "The offset of the last octet in a frame the point can perform
+         filtering against.";
     }
-
     list samplers {
-      description "A list of all the samplers attached to this point.";
-
-      config true;
       key "name";
-
+      description
+        "A list of all the samplers attached to this point.";
       leaf name {
-        mandatory true;
         type string;
-        description "A unique name given to this sampler.";
+        mandatory true;
+        description
+          "A unique name given to this sampler.";
       }
-
+      leaf status {
+        type status-type;
+        mandatory true;
+        description
+          "The current status of this sampler.";
+      }
+      leaf client-heartbeat {
+        type uint32;
+        mandatory true;
+        description
+          "The number of seconds since the Client has refreshed this
+           request.  The Client MUST only be able to set this value to
+           0, the Replicator MUST keep track of it, and MAY opt to
+           delete this entry when it reaches 3600.";
+      }
       container destination {
-        description "The destination of where to send the UDP stream to.";
+        description
+          "The destination of where to send the UDP stream to.";
         leaf type {
-          mandatory true;
           type destination-type;
-          description "The type of encoding for the destination.";
+          mandatory true;
+          description
+            "The type of encoding for the destination.";
         }
         container udp-parameters {
-          description "Parameters for destination-type=udp.  Source
-           port is always the port number assigned by IANA.";
           when "../type='udp'";
+          description
+            "Parameters for destination-type=udp.  Source port is always
+             the port number assigned by IANA.";
           leaf destination-ip {
-            mandatory true;
             type inet:ip-address-no-zone;
-            description "The destination IP to send the stream to.";
+            mandatory true;
+            description
+              "The destination IP to send the stream to.";
           }
           leaf destination-port {
-            mandatory true;
             type inet:port-number;
-            description "The destination UDP port number to send the
-             stream to.";
+            mandatory true;
+            description
+              "The destination UDP port number to send the stream to.";
           }
         }
       }
-
-      leaf ratio {
-        mandatory true;
+      container request {
+        description
+          "The request as sent in by a Client.";
+        container filters {
+          description
+            "Requested filters to apply to the stream.";
+          uses filters;
+        }
+        leaf ratio {
+          type uint32 {
+            range "1..max";
+          }
+          mandatory true;
+          description
+            "The requested sampling ratio (1:N, with N being this
+             value).";
+        }
+        leaf min-ratio {
+          type uint32 {
+            range "1..max";
+          }
+          description
+            "The minimum value of N the client will accept.";
+        }
+        leaf max-ratio {
+          type uint32 {
+            range "1..max";
+          }
+          description
+            "The maximum value of N the client will accept.";
+        }
+      }
+      list proposals {
+        key "id";
+        config false;
+        description
+          "The proposals as offered by the Replicator.";
+        leaf id {
+          type uint32 {
+            range "1..max";
+          }
+          description
+            "An id-number representing this proposal for selection.";
+        }
+        leaf ratio {
+          type uint32 {
+            range "1..max";
+          }
+          mandatory true;
+          description
+            "The offered ratio available.";
+        }
+        leaf performance-penalty {
+          type boolean;
+          description
+            "Selecting this offer will result in a perfomance penalty on
+             the device (usually due to ASIC recirculation)";
+        }
+        leaf performance-penalty-amount {
+          type uint16 {
+            range "0..10000";
+          }
+          description
+            "The performance penalty amount, in hundredths of a percent.
+             This value is not required even if performance-penalty is
+             true.  If present, it MUST be treated as an estimate.";
+        }
+        container stream-format {
+          description
+            "The stream format that would be generated if this proposal
+             is selected.";
+          uses stream-format;
+        }
+        list filters {
+          key "name";
+          description
+            "The filters the Replicator can actually apply in this
+             proposal.  These MAY NOT match the request.";
+          uses filters;
+        }
+      }
+      leaf proposal-error {
+        type string;
+        description
+          "The Replicator was unable to generate any Proposals.";
+      }
+      leaf proposal-selected {
         type uint32 {
           range "1..max";
         }
-        description "The requested sampling ratio (1:N, with N being
-         this value).";
+        description
+          "The ID of the proposal above the Client wants
+           to use.";
       }
-
-      list filters {
-        description "A list of filters applied to this sampling. 
-         Multiple filters are logically ANDed together.";
-
-        key "name";
-        leaf name {
-          description "A name for this filter.";
-          type string;
-        }
-
-        list interfaces {
-          when "../type = 'interfaces'";
-          description "Filter down to only this list of interfaces.";
-          key "int";
-          leaf int {
-            description "A specific interface to filter against.";
-            type if:interface-ref;
-          }
-        }
-
-        list actions {
-          when "../type = 'action'";
-          description "Filter down to only this list of actions.";
-          key "action";
-          leaf action {
-            description "One specific action code.";
-            type action-type;
-          }
-        }
-
-        list directions {
-          when "../type = 'direction'";
-          description "Which direction(s) to sample traffic in.";
-          key "direction";
-          leaf direction {
-            description "Specific direction code.";
-            type direction-type;
-          }
-        }
-
-        leaf type {
-          description "The type of filter associated.";
-          type filter-type;
-          mandatory true;
-        }
-
-        leaf ipv4-address {
-          when "../type = 'ip-v4-srcip' | ../type = 'ip-v4-dstip'";
-          type inet:ipv4-address-no-zone;
-          description "The IPv4 address to filter on.";
-        }
-
-        leaf ipv6-address {
-          when "../type = 'ip-v6-srcip' | ../type = 'ip-v6-dstip'";
-          type inet:ipv6-address-no-zone;
-          description "The IPv6 address to filter on.";
-        }
-
-        leaf version {
-          when "../type = 'ip-version'";
-          type inet:ip-version;
-          description "The value of the IP version number to match on.";          
-        }
-
-        container frame-payload {
-          when "../type = 'frame-payload'";
-          description "Frame payload fragment to match on.";
-
-          leaf offset {
-            description "Offset in octets from the start of the frame
-             to begin the match on.";
-            type uint16;
-          }
-          leaf match {
-            description "The bytes to match on.";
-            type binary;
-          }
-        }
-
-        leaf frame-length {
-          when "../type = 'frame-length'";
-          type uint16;
-          description "Frame length to match on.";
-        }
-
-      }
-      container stream-format {
-        config false; 
-        description "This contains the packet format data that this
-         sampling stream is sending.  This is only valid after
-         configuration.  The length fields are given in bits, and are
-         consecutive.  Needed gaps should use a 'padding' element.";
-
-        list fields {
-          description "The listing of the fields that will be
-           encapsulated and sent to the receiver.";
-
-          key "name";
-          leaf name {
-            type string;
-            description "Human readable name of what this field
-             contains.";
-          }
-          leaf size {
-            type uint32 {
-              range "0..524280";
-            }
-            description "The size of this field, in bits.  The value
-             of '0' denotes a variable-sized field.";
-          }
-          leaf type {
-            type field-type;
-            description "The type of this data.";
-          }
-
-          list action-mappings {
-            description "The mapping of values to action-type codes,
-             valid for type=action.";
-            key "value";
-            when "../type='action'";
-            leaf value {
-              type binary;
-              description "The value that will appear in the header.";
-            }
-            leaf meaning {
-              type action-type;
-              description "What this value indicates.";
-            }
-          }
- 
-          list port-mappings {
-            description "The mapping of values to interfaces, valid for
-             type=ingress-port or type=egress-port";
-            key "value";
-            when "../type='ingress-port' | ../type='egress-port'";
-            leaf value {
-              type binary;
-              description "The value that will appear in the header.";
-            }
-            leaf port {
-              type if:interface-ref;
-              description "The port the value maps to.";
-            }              
-          }
-
-          list direction-mappings {
-            description "The mapping of values to direction codes,
-             valid for type=direction.";
-            key "value";
-            when "../type='direction'";
-            leaf value {
-              type binary;
-              description "The value that will appear in the header.";
-            }
-            leaf direction {
-              type direction-type;
-              description "The direction the traffic in respect to the
-               port.";
-            }
-          }
- 
-          container timestamp {
-            description "Supplemental data for type=timestamp*, in PTP
-             Truncated Timestamp Format.  Provides the time used as the
-             epoch for the number in the data stream.";
-            when "../type='timestamp-nsec' | ../type='timestamp-usec' |
-             ../type='timestamp-msec'";
- 
-            leaf seconds {
-              type uint32;
-              description "Specifies the integer portion of the number 
-               of seconds since the epoch.";
-            }
-            leaf nanoseconds {
-              type uint32;
-              description "Specifies the fractional portion of the number
-               of seconds since the epoch, in integer number of nanoseconds.";                  
-            }
-          }
-        }
+      leaf install-error {
+        type string;
+        description
+          "The Replicator was unable to install the requested Proposal
+           for this reason.";
       }
     }
   }
