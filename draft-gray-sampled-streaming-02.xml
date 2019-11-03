@@ -114,8 +114,8 @@
 		    <artwork>
           <![CDATA[
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
-|        Analysis         |   Higher level applications perform further 
-+-+-+-+-+-+-+-+-+-+-+-+-+-+   analysis on aggregated data
+|        Analysis         |   Higher level applications perform  
++-+-+-+-+-+-+-+-+-+-+-+-+-+   further analysis on aggregated data
             ^^
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
 |  Collection / Decoding  |   Sample arrives at collector, decoded, 
@@ -166,9 +166,9 @@
         <t>A Client MUST first request from the Replicator the available configurations via the 'points' branch, which provides the following information:
           <ul>
             <li><t>'name' - The name of the Point.  This services as a key, and SHOULD NOT be interpreted as anything other than a uniquely identifying value.  A Replicator MAY choose to use an internal path, an encoded address, or any other value of its choosing.</t></li>
-            <li><t>'interfaces' - The physical interfaces this Point is servicing.  A Replicator MAY offer the same interfaces under different Points, with a different set of options.  A Replicator MAY NOT offer a Point for every interface available on the system.</t></li>
-            <li><t>'filters' - What filters can be applied (for example, against certain IP fields, against parts of the frame, etc.).  A Replicator MAY NOT be able to honor every combination of filters submitted in a request, or MAY NOT offer any filtering capability at all.  A Replicator MAY only be able to support a limited number of filters, which MAY be returned in in the 'max-filters' branch.</t></li>
-            <li><t>'min-ratio' and 'max-ratio' - Minimum and maximum sampling rates possible at this point.  These are provided as a number N, denoting one sample will be returned for every N.  A Replicator MAY NOT be able to offer a 'min-ratio' of 1 (i.e. every packet).</t></li>
+            <li><t>'interfaces' - The physical interfaces this Point is servicing.  A Replicator MAY offer the same interfaces under different Points, with a different set of options.  A Replicator MAY not offer a Point for every interface available on the system.</t></li>
+            <li><t>'filters' - What filters can be applied (for example, against certain IP fields, against parts of the frame, etc.).  A Replicator MAY not be able to honor every combination of filters submitted in a request, or MAY not offer any filtering capability at all.  A Replicator MAY only be able to support a limited number of filters, which MAY be returned in in the 'max-filters' branch.</t></li>
+            <li><t>'min-ratio' and 'max-ratio' - Minimum and maximum sampling rates possible at this point.  These are provided as a number N, denoting one sample will be returned for every N.  A Replicator MAY not be able to offer a 'min-ratio' of 1 (i.e. every packet).</t></li>
             <li><t>'samplers' - A list of any current samplers already active on this Point as requested by this Client, and the branch manipulated in the next section.  A Replicator SHOULD NOT inform a Client about the sampling sessions from other Clients.</t></li> 
             <li><t>Optionally, the maximum frame length the Point can replicate into the sample in 'max-frame-length-copy'.</t></li>
             <li><t>Optionally, the maximum offset into a frame the Point can inspect in 'max-frame-depth-inspect'.</t></li>
@@ -246,7 +246,7 @@
         <c>Incoming port</c><c>8</c><c>port-ingress</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"/>.</c>
         <c>Timestamp</c><c>24</c><c>timestamp-nsec-ingress</c><c>Two 32 bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
         <c>Act</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
-        <c>Frame Length</c><c>17</c><c>frame-length-ingress</c><c>Note that this denotes the original frame length - the payload field MAY NOT include the entire payload.</c>
+        <c>Frame Length</c><c>17</c><c>frame-length-ingress</c><c>Note that this denotes the original frame length - the payload field MAY not include the entire payload.</c>
         <c>Internal Data 1</c><c>13</c><c>padding</c><c/>
         <c>Payload</c><c>0</c><c>frame-payload-ingress</c><c/>
       </texttable>
@@ -316,18 +316,10 @@ reference: This document]]>
       &PCAPNG;    
     </references>
     <section anchor="yang_tree" title="Yang Model Tree Reference">
-      <figure>
-        <sourcecode>
-          <xi:include href="ietf-sampled-streaming@2019-10-22.tree" parse="text"/>
-        </sourcecode>
-      </figure>
+        <sourcecode src="ietf-sampled-streaming@2019-10-22.tree" />
     </section>     
     <section anchor="yang_model" title="Yang Model">
-      <figure>
-        <sourcecode type="yang">
-          <xi:include href="ietf-sampled-streaming@2019-10-22.yang" parse="text"/>
-        </sourcecode>
-      </figure>
+        <sourcecode type="yang" src="ietf-sampled-streaming@2019-10-22.yang" />
     </section>
   </back>
 </rfc>

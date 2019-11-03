@@ -68,7 +68,7 @@ module ietf-sampled-streaming {
       }
       enum action {
         description
-          "Filter against a list of actions that the Point took (i.e.,
+          "Filter against a list of actions that the Point took (i.e.
            only consider packets that were actually forwarded).";
       }
       enum direction {
@@ -187,25 +187,25 @@ module ietf-sampled-streaming {
       enum frame-length {
         description
           "The generic frame length.  Note that due to chipset
-           capabilities, this MAY NOT be the same as the captured packet
-           length.";
+           capabilities, this MAY not be the same as the captured
+           packet length.";
       }
       enum frame-length-ingress {
         description
-          "The frame length as received by the point.  Note that due to
-           chipset capabilities, this MAY NOT be the same as the
+          "The frame length as received by the point.  Note that due
+           to chipset capabilities, this MAY not be the same as the
            captured packet length.";
       }
       enum frame-length-egress {
         description
           "The frame length after local processing, as it leaves the
-           point.  Note that due to chipset capabilities, this MAY NOT
-           be the same as the captured packet length.";
+           point.  Note that due to chipset capabilities, this MAY
+           not be the same as the captured packet length.";
       }
       enum frame-payload-size {
         description
-          "The length of the payload that has actually been copied into
-           this stream.";
+          "The length of the payload that has actually been copied
+           into this stream.";
       }
       enum frame-payload-ingress {
         description
@@ -217,13 +217,13 @@ module ietf-sampled-streaming {
       }
       enum action {
         description
-          "The action that was taken on this frame.  Values are mapped
-           as according to action-type.";
+          "The action that was taken on this frame.  Values are
+           mapped as according to action-type.";
       }
     }
     description
-      "Types of data included in the data stream provided back to the
-       receiver.  Note that all fields MAY NOT be provided.";
+      "Types of data included in the data stream provided back to
+       the receiver.  Note that all fields MAY not be provided.";
   }
 
   typedef action-type {
@@ -265,8 +265,8 @@ module ietf-sampled-streaming {
       }
       enum dropped {
         description
-          "Generically dropped.  A more specific action type code SHOULD
-           be used.";
+          "Generically dropped.  A more specific action type code
+           SHOULD be used.";
       }
       enum dropped-rate-limit {
         description
@@ -336,8 +336,8 @@ module ietf-sampled-streaming {
       }
       enum replicator-proposals-available {
         description
-          "The Replicator has finished processing the request, and has
-           proposals available in the 'proposals' branch.";
+          "The Replicator has finished processing the request, and
+           has proposals available in the 'proposals' branch.";
       }
       enum replicator-proposal-error {
         description
@@ -347,18 +347,18 @@ module ietf-sampled-streaming {
       }
       enum client-proposal-selected {
         description
-          "The Client has updated 'proposal-selected' and is ready for
-           the Replicator to install the requested sampling.";
+          "The Client has updated 'proposal-selected' and is ready
+           for the Replicator to install the requested sampling.";
       }
       enum replicator-install-success {
         description
-          "The Replicator has successfully activated the sampling, and
-           it is operating.";
+          "The Replicator has successfully activated the sampling,
+           and it is operating.";
       }
       enum replicator-install-error {
         description
-          "The Replicator encountered an error installing the sampling.
-           'install-error' MAY contain an explanation.";
+          "The Replicator encountered an error installing the
+           sampling. 'install-error' MAY contain an explanation.";
       }
     }
     description
@@ -515,15 +515,15 @@ module ietf-sampled-streaming {
 
   grouping stream-format {
     description
-      "This contains the packet format data that this sampling stream is
-       sending.  This is only valid after configuration.  The length
-       fields are given in bits, and are consecutive.  Needed gaps
-       should use a 'padding' element.";
+      "This contains the packet format data that this sampling stream
+       is sending.  This is only valid after configuration.  The
+       length fields are given in bits, and are consecutive.  Needed
+       gaps should use a 'padding' element.";
     list fields {
       key "name";
       description
-        "The listing of the fields that will be encapsulated and sent to
-         the receiver.";
+        "The listing of the fields that will be encapsulated and sent
+         to the receiver.";
       leaf name {
         type string;
         description
@@ -534,8 +534,8 @@ module ietf-sampled-streaming {
           range "0..524280";
         }
         description
-          "The size of this field, in bits.  The value of '0' denotes a
-           variable-sized field.";
+          "The size of this field, in bits.  The value of '0' denotes
+           a variable-sized field.";
       }
       leaf type {
         type field-type;
@@ -609,8 +609,9 @@ module ietf-sampled-streaming {
         leaf nanoseconds {
           type uint32;
           description
-            "Specifies the fractional portion of the number of seconds
-             since the epoch, in integer number of nanoseconds.";
+            "Specifies the fractional portion of the number of
+             seconds since the epoch, in integer number of
+             nanoseconds.";
         }
       }
       leaf payload-contents {
@@ -619,10 +620,10 @@ module ietf-sampled-streaming {
         type frame-headers;
         description
           "Details about what parts of the frame this payload field
-           SHOULD contain.  Note carefully the 'SHOULD' - for a variety
-           of reasons (different forwarding paths, exception handling,
-           etc.), the actual headers of any one frame MAY be different
-           than this.";
+           SHOULD contain.  Note carefully the 'SHOULD' - for a
+           variety of reasons (different forwarding paths, exception
+           handling, etc.), the actual headers of any one frame MAY
+           be different than this.";
       }
     }
   }
@@ -631,8 +632,8 @@ module ietf-sampled-streaming {
     key "name";
     description
       "A listing of the capture points available on this device, what
-       ports they provide for, and what filtering is available at those
-       points.";
+       ports they provide for, and what filtering is available at
+       those points.";
     leaf name {
       type string;
       description
@@ -667,8 +668,8 @@ module ietf-sampled-streaming {
       config false;
       mandatory true;
       description
-        "The minimum sampling ratio (1:N, with N being this value) this
-         point can provide.";
+        "The minimum sampling ratio (1:N, with N being this value)
+         this point can provide.";
     }
     leaf max-ratio {
       type uint32 {
@@ -677,15 +678,15 @@ module ietf-sampled-streaming {
       config false;
       mandatory true;
       description
-        "The maximum sampling ratio (1:N, with N being this value) this
-         point can provide.";
+        "The maximum sampling ratio (1:N, with N being this value)
+         this point can provide.";
     }
     leaf max-samplers {
       type uint32;
       config false;
       description
-        "The maximum number of additional samplers that can be installed
-         at this point.";
+        "The maximum number of additional samplers that can be
+         installed at this point.";
     }
     leaf max-filters {
       type uint32;
@@ -699,15 +700,15 @@ module ietf-sampled-streaming {
       type uint16;
       config false;
       description
-        "The maximum size that the point can replicate and copy into the
-         header.";
+        "The maximum size that the point can replicate and copy into
+         the header.";
     }
     leaf max-frame-depth-inspect {
       type uint16;
       config false;
       description
-        "The offset of the last octet in a frame the point can perform
-         filtering against.";
+        "The offset of the last octet in a frame the point can
+         perform filtering against.";
     }
     list samplers {
       key "name";
@@ -730,8 +731,8 @@ module ietf-sampled-streaming {
         mandatory true;
         description
           "The number of seconds since the Client has refreshed this
-           request.  The Client MUST only be able to set this value to
-           0, the Replicator MUST keep track of it, and MAY opt to
+           request.  The Client MUST only be able to set this value
+           to 0, the Replicator MUST keep track of it, and MAY opt to
            delete this entry when it reaches 3600.";
       }
       container destination {
@@ -746,8 +747,8 @@ module ietf-sampled-streaming {
         container udp-parameters {
           when "../type='udp'";
           description
-            "Parameters for destination-type=udp.  Source port is always
-             the port number assigned by IANA.";
+            "Parameters for destination-type=udp.  Source port is
+             always the port number assigned by IANA.";
           leaf destination-ip {
             type inet:ip-address-no-zone;
             mandatory true;
@@ -758,7 +759,8 @@ module ietf-sampled-streaming {
             type inet:port-number;
             mandatory true;
             description
-              "The destination UDP port number to send the stream to.";
+              "The destination UDP port number to send the stream
+               to.";
           }
         }
       }
@@ -817,29 +819,30 @@ module ietf-sampled-streaming {
         leaf performance-penalty {
           type boolean;
           description
-            "Selecting this offer will result in a perfomance penalty on
-             the device (usually due to ASIC recirculation)";
+            "Selecting this offer will result in a perfomance penalty
+             on the device (usually due to ASIC recirculation)";
         }
         leaf performance-penalty-amount {
           type uint16 {
             range "0..10000";
           }
           description
-            "The performance penalty amount, in hundredths of a percent.
-             This value is not required even if performance-penalty is
-             true.  If present, it MUST be treated as an estimate.";
+            "The performance penalty amount, in hundredths of a
+             percent.  This value is not required even if
+             performance-penalty is true.  If present, it MUST be
+             treated as an estimate.";
         }
         container stream-format {
           description
-            "The stream format that would be generated if this proposal
-             is selected.";
+            "The stream format that would be generated if this
+             proposal is selected.";
           uses stream-format;
         }
         list filters {
           key "name";
           description
             "The filters the Replicator can actually apply in this
-             proposal.  These MAY NOT match the request.";
+             proposal.  These MAY not match the request.";
           uses filters;
         }
       }
@@ -859,8 +862,8 @@ module ietf-sampled-streaming {
       leaf install-error {
         type string;
         description
-          "The Replicator was unable to install the requested Proposal
-           for this reason.";
+          "The Replicator was unable to install the requested
+           Proposal for this reason.";
       }
     }
   }

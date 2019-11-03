@@ -171,8 +171,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |        Analysis         |   Higher level applications perform further
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+   analysis on aggregated data
+   |        Analysis         |   Higher level applications perform
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+   further analysis on aggregated data
                ^^
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
    |  Collection / Decoding  |   Sample arrives at collector, decoded,
@@ -360,20 +360,20 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
    *  'interfaces' - The physical interfaces this Point is servicing.  A
       Replicator MAY offer the same interfaces under different Points,
-      with a different set of options.  A Replicator MAY NOT offer a
+      with a different set of options.  A Replicator MAY not offer a
       Point for every interface available on the system.
 
    *  'filters' - What filters can be applied (for example, against
       certain IP fields, against parts of the frame, etc.).  A
-      Replicator MAY NOT be able to honor every combination of filters
-      submitted in a request, or MAY NOT offer any filtering capability
+      Replicator MAY not be able to honor every combination of filters
+      submitted in a request, or MAY not offer any filtering capability
       at all.  A Replicator MAY only be able to support a limited number
       of filters, which MAY be returned in in the 'max-filters' branch.
 
    *  'min-ratio' and 'max-ratio' - Minimum and maximum sampling rates
       possible at this point.  These are provided as a number N,
       denoting one sample will be returned for every N.  A Replicator
-      MAY NOT be able to offer a 'min-ratio' of 1 (i.e. every packet).
+      MAY not be able to offer a 'min-ratio' of 1 (i.e. every packet).
 
    *  'samplers' - A list of any current samplers already active on this
       Point as requested by this Client, and the branch manipulated in
@@ -647,7 +647,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    |           |       |                        | original frame       |
    |           |       |                        | length - the         |
    |           |       |                        | payload field MAY    |
-   |           |       |                        | NOT include the      |
+   |           |       |                        | not include the      |
    |           |       |                        | entire payload.      |
    +-----------+-------+------------------------+----------------------+
    | Internal  | 13    | padding                |                      |
@@ -926,7 +926,6 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            +--rw proposal-selected?   uint32
            +--rw install-error?       string
 
-
 Appendix B.  Yang Model
 
    module ietf-sampled-streaming {
@@ -946,6 +945,7 @@ Appendix B.  Yang Model
        "Editor:    Andrew Gray
         <mailto:Andrew.Gray@charter.com>";
      description
+       "This module contains a collection of YANG definitions for
 
 
 
@@ -954,7 +954,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 17]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-       "This module contains a collection of YANG definitions for
         managing sampled streaming subscriptions.
 
         Copyright (c) 2019 IETF Trust and the persons identified as
@@ -1002,6 +1001,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
      typedef filter-type {
        type enumeration {
          enum interfaces {
+           description
 
 
 
@@ -1010,12 +1010,11 @@ Gray & Wobker              Expires 6 May 2020                  [Page 18]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           description
              "List of interfaces to filter against.";
          }
          enum action {
            description
-             "Filter against a list of actions that the Point took (i.e.,
+             "Filter against a list of actions that the Point took (i.e.
               only consider packets that were actually forwarded).";
          }
          enum direction {
@@ -1058,6 +1057,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            description
              "Specific payload octets.";
          }
+         enum frame-length {
 
 
 
@@ -1066,7 +1066,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 19]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-         enum frame-length {
            description
              "Specific frame length.";
          }
@@ -1114,6 +1113,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              "The timestamp the packet was received at, in integer
               microseconds.  The epoch of this number is provided in the
               timestamp container of the returned field information.";
+         }
 
 
 
@@ -1122,7 +1122,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 20]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-         }
          enum timestamp-nsec-ingress {
            description
              "The timestamp the packet was received at, in integer
@@ -1150,26 +1149,27 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          enum frame-length {
            description
              "The generic frame length.  Note that due to chipset
-              capabilities, this MAY NOT be the same as the captured packet
-              length.";
+              capabilities, this MAY not be the same as the captured
+              packet length.";
          }
          enum frame-length-ingress {
            description
-             "The frame length as received by the point.  Note that due to
-              chipset capabilities, this MAY NOT be the same as the
+             "The frame length as received by the point.  Note that due
+              to chipset capabilities, this MAY not be the same as the
               captured packet length.";
          }
          enum frame-length-egress {
            description
              "The frame length after local processing, as it leaves the
-              point.  Note that due to chipset capabilities, this MAY NOT
-              be the same as the captured packet length.";
+              point.  Note that due to chipset capabilities, this MAY
+              not be the same as the captured packet length.";
          }
          enum frame-payload-size {
            description
-             "The length of the payload that has actually been copied into
-              this stream.";
+             "The length of the payload that has actually been copied
+              into this stream.";
          }
+         enum frame-payload-ingress {
 
 
 
@@ -1178,7 +1178,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 21]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-         enum frame-payload-ingress {
            description
              "The payload of the frame, as received the point.";
          }
@@ -1188,13 +1187,13 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          }
          enum action {
            description
-             "The action that was taken on this frame.  Values are mapped
-              as according to action-type.";
+             "The action that was taken on this frame.  Values are
+              mapped as according to action-type.";
          }
        }
        description
-         "Types of data included in the data stream provided back to the
-          receiver.  Note that all fields MAY NOT be provided.";
+         "Types of data included in the data stream provided back to
+          the receiver.  Note that all fields MAY not be provided.";
      }
 
      typedef action-type {
@@ -1226,6 +1225,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              "Forwarded after a CPU punt.";
          }
          enum forwarded-tunnel {
+           description
 
 
 
@@ -1234,7 +1234,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 22]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           description
              "Forwarded with additional outer wrapper for tunneling.";
          }
          enum forwarded-tunnel-frr {
@@ -1244,8 +1243,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          }
          enum dropped {
            description
-             "Generically dropped.  A more specific action type code SHOULD
-              be used.";
+             "Generically dropped.  A more specific action type code
+              SHOULD be used.";
          }
          enum dropped-rate-limit {
            description
@@ -1282,6 +1281,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          enum udp {
            description
              "Sent with a UDP header.";
+         }
 
 
 
@@ -1290,7 +1290,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 23]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-         }
        }
        description
          "Different possible destination types.";
@@ -1323,8 +1322,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          }
          enum replicator-proposals-available {
            description
-             "The Replicator has finished processing the request, and has
-              proposals available in the 'proposals' branch.";
+             "The Replicator has finished processing the request, and
+              has proposals available in the 'proposals' branch.";
          }
          enum replicator-proposal-error {
            description
@@ -1334,10 +1333,11 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          }
          enum client-proposal-selected {
            description
-             "The Client has updated 'proposal-selected' and is ready for
-              the Replicator to install the requested sampling.";
+             "The Client has updated 'proposal-selected' and is ready
+              for the Replicator to install the requested sampling.";
          }
          enum replicator-install-success {
+           description
 
 
 
@@ -1346,14 +1346,13 @@ Gray & Wobker              Expires 6 May 2020                  [Page 24]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           description
-             "The Replicator has successfully activated the sampling, and
-              it is operating.";
+             "The Replicator has successfully activated the sampling,
+              and it is operating.";
          }
          enum replicator-install-error {
            description
-             "The Replicator encountered an error installing the sampling.
-              'install-error' MAY contain an explanation.";
+             "The Replicator encountered an error installing the
+              sampling. 'install-error' MAY contain an explanation.";
          }
        }
        description
@@ -1394,6 +1393,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              "Will include any inner 802.1ad QinQ VLAN tag.";
          }
          bit eth-l2-type {
+           position 6;
 
 
 
@@ -1402,7 +1402,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 25]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           position 6;
            description
              "Will include the Ethertype or size.";
          }
@@ -1450,6 +1449,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          when "../type = 'action'";
          key "action";
          description
+           "Filter down to only this list of actions.";
 
 
 
@@ -1458,7 +1458,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 26]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           "Filter down to only this list of actions.";
          leaf action {
            type action-type;
            description
@@ -1506,6 +1505,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            "Frame payload fragment to match on.";
          leaf offset {
            type uint16;
+           description
 
 
 
@@ -1514,7 +1514,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 27]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           description
              "Offset in octets from the start of the frame to begin the
               match on.";
          }
@@ -1534,15 +1533,15 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
      grouping stream-format {
        description
-         "This contains the packet format data that this sampling stream is
-          sending.  This is only valid after configuration.  The length
-          fields are given in bits, and are consecutive.  Needed gaps
-          should use a 'padding' element.";
+         "This contains the packet format data that this sampling stream
+          is sending.  This is only valid after configuration.  The
+          length fields are given in bits, and are consecutive.  Needed
+          gaps should use a 'padding' element.";
        list fields {
          key "name";
          description
-           "The listing of the fields that will be encapsulated and sent to
-            the receiver.";
+           "The listing of the fields that will be encapsulated and sent
+            to the receiver.";
          leaf name {
            type string;
            description
@@ -1553,8 +1552,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              range "0..524280";
            }
            description
-             "The size of this field, in bits.  The value of '0' denotes a
-              variable-sized field.";
+             "The size of this field, in bits.  The value of '0' denotes
+              a variable-sized field.";
          }
          leaf type {
            type field-type;
@@ -1562,6 +1561,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              "The type of this data.";
          }
          list action-mappings {
+           when "../type='action'";
 
 
 
@@ -1570,7 +1570,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 28]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           when "../type='action'";
            key "value";
            description
              "The mapping of values to action-type codes, valid for
@@ -1618,6 +1617,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              type direction-type;
              description
                "The direction the traffic in respect to the port.";
+           }
 
 
 
@@ -1626,7 +1626,6 @@ Gray & Wobker              Expires 6 May 2020                  [Page 29]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           }
          }
          container timestamp {
            when "../type='timestamp-nsec' | ../type='timestamp-usec' |
@@ -1644,8 +1643,9 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            leaf nanoseconds {
              type uint32;
              description
-               "Specifies the fractional portion of the number of seconds
-                since the epoch, in integer number of nanoseconds.";
+               "Specifies the fractional portion of the number of
+                seconds since the epoch, in integer number of
+                nanoseconds.";
            }
          }
          leaf payload-contents {
@@ -1654,10 +1654,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            type frame-headers;
            description
              "Details about what parts of the frame this payload field
-              SHOULD contain.  Note carefully the 'SHOULD' - for a variety
-              of reasons (different forwarding paths, exception handling,
-              etc.), the actual headers of any one frame MAY be different
-              than this.";
+              SHOULD contain.  Note carefully the 'SHOULD' - for a
+              variety of reasons (different forwarding paths, exception
+              handling, etc.), the actual headers of any one frame MAY
+              be different than this.";
          }
        }
      }
@@ -1666,8 +1666,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
        key "name";
        description
          "A listing of the capture points available on this device, what
-          ports they provide for, and what filtering is available at those
-          points.";
+          ports they provide for, and what filtering is available at
+          those points.";
        leaf name {
          type string;
          description
@@ -1710,8 +1710,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          config false;
          mandatory true;
          description
-           "The minimum sampling ratio (1:N, with N being this value) this
-            point can provide.";
+           "The minimum sampling ratio (1:N, with N being this value)
+            this point can provide.";
        }
        leaf max-ratio {
          type uint32 {
@@ -1720,15 +1720,15 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          config false;
          mandatory true;
          description
-           "The maximum sampling ratio (1:N, with N being this value) this
-            point can provide.";
+           "The maximum sampling ratio (1:N, with N being this value)
+            this point can provide.";
        }
        leaf max-samplers {
          type uint32;
          config false;
          description
-           "The maximum number of additional samplers that can be installed
-            at this point.";
+           "The maximum number of additional samplers that can be
+            installed at this point.";
        }
 
 
@@ -1750,15 +1750,15 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          type uint16;
          config false;
          description
-           "The maximum size that the point can replicate and copy into the
-            header.";
+           "The maximum size that the point can replicate and copy into
+            the header.";
        }
        leaf max-frame-depth-inspect {
          type uint16;
          config false;
          description
-           "The offset of the last octet in a frame the point can perform
-            filtering against.";
+           "The offset of the last octet in a frame the point can
+            perform filtering against.";
        }
        list samplers {
          key "name";
@@ -1781,8 +1781,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            mandatory true;
            description
              "The number of seconds since the Client has refreshed this
-              request.  The Client MUST only be able to set this value to
-              0, the Replicator MUST keep track of it, and MAY opt to
+              request.  The Client MUST only be able to set this value
+              to 0, the Replicator MUST keep track of it, and MAY opt to
               delete this entry when it reaches 3600.";
          }
          container destination {
@@ -1805,8 +1805,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            container udp-parameters {
              when "../type='udp'";
              description
-               "Parameters for destination-type=udp.  Source port is always
-                the port number assigned by IANA.";
+               "Parameters for destination-type=udp.  Source port is
+                always the port number assigned by IANA.";
              leaf destination-ip {
                type inet:ip-address-no-zone;
                mandatory true;
@@ -1817,7 +1817,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
                type inet:port-number;
                mandatory true;
                description
-                 "The destination UDP port number to send the stream to.";
+                 "The destination UDP port number to send the stream
+                  to.";
              }
            }
          }
@@ -1841,7 +1842,6 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            leaf min-ratio {
              type uint32 {
                range "1..max";
-             }
 
 
 
@@ -1850,6 +1850,7 @@ Gray & Wobker              Expires 6 May 2020                  [Page 33]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
+             }
              description
                "The minimum value of N the client will accept.";
            }
@@ -1884,20 +1885,19 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            leaf performance-penalty {
              type boolean;
              description
-               "Selecting this offer will result in a perfomance penalty on
-                the device (usually due to ASIC recirculation)";
+               "Selecting this offer will result in a perfomance penalty
+                on the device (usually due to ASIC recirculation)";
            }
            leaf performance-penalty-amount {
              type uint16 {
                range "0..10000";
              }
              description
-               "The performance penalty amount, in hundredths of a percent.
-                This value is not required even if performance-penalty is
-                true.  If present, it MUST be treated as an estimate.";
+               "The performance penalty amount, in hundredths of a
+                percent.  This value is not required even if
+                performance-penalty is true.  If present, it MUST be
+                treated as an estimate.";
            }
-           container stream-format {
-             description
 
 
 
@@ -1906,15 +1906,17 @@ Gray & Wobker              Expires 6 May 2020                  [Page 34]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-               "The stream format that would be generated if this proposal
-                is selected.";
+           container stream-format {
+             description
+               "The stream format that would be generated if this
+                proposal is selected.";
              uses stream-format;
            }
            list filters {
              key "name";
              description
                "The filters the Replicator can actually apply in this
-                proposal.  These MAY NOT match the request.";
+                proposal.  These MAY not match the request.";
              uses filters;
            }
          }
@@ -1934,13 +1936,12 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          leaf install-error {
            type string;
            description
-             "The Replicator was unable to install the requested Proposal
-              for this reason.";
+             "The Replicator was unable to install the requested
+              Proposal for this reason.";
          }
        }
      }
    }
-
 
 Authors' Addresses
 
@@ -1952,7 +1953,6 @@ Authors' Addresses
 
    Phone: +1 720 699 5125
    Email: Andrew.Gray@charter.com
-
 
 
 
