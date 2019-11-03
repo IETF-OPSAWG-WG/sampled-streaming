@@ -1,0 +1,84 @@
+module: ietf-sampled-streaming
+  +--rw points* [name]
+     +--rw name                       string
+     +--ro interfaces* []
+     |  +--ro if    if:interface-ref
+     +--ro filters* []
+     |  +--ro filter    filter-type
+     +--ro min-ratio                  uint32
+     +--ro max-ratio                  uint32
+     +--ro max-samplers?              uint32
+     +--ro max-filters?               uint32
+     +--ro max-frame-length-copy?     uint16
+     +--ro max-frame-depth-inspect?   uint16
+     +--rw samplers* [name]
+        +--rw name                 string
+        +--rw status               status-type
+        +--rw client-heartbeat     uint32
+        +--rw destination
+        |  +--rw type              destination-type
+        |  +--rw udp-parameters
+        |     +--rw destination-ip      inet:ip-address-no-zone
+        |     +--rw destination-port    inet:port-number
+        +--rw request
+        |  +--rw filters
+        |  |  +--rw name?            string
+        |  |  +--rw interfaces* [int]
+        |  |  |  +--rw int    if:interface-ref
+        |  |  +--rw actions* [action]
+        |  |  |  +--rw action    action-type
+        |  |  +--rw directions* [direction]
+        |  |  |  +--rw direction    direction-type
+        |  |  +--rw type             filter-type
+        |  |  +--rw ipv4-address?    inet:ipv4-address-no-zone
+        |  |  +--rw ipv6-address?    inet:ipv6-address-no-zone
+        |  |  +--rw version?         inet:ip-version
+        |  |  +--rw frame-payload
+        |  |  |  +--rw offset?   uint16
+        |  |  |  +--rw match?    binary
+        |  |  +--rw frame-length?    uint16
+        |  +--rw ratio        uint32
+        |  +--rw min-ratio?   uint32
+        |  +--rw max-ratio?   uint32
+        +--ro proposals* [id]
+        |  +--ro id                            uint32
+        |  +--ro ratio                         uint32
+        |  +--ro performance-penalty?          boolean
+        |  +--ro performance-penalty-amount?   uint16
+        |  +--ro stream-format
+        |  |  +--ro fields* [name]
+        |  |     +--ro name                  string
+        |  |     +--ro size?                 uint32
+        |  |     +--ro type?                 field-type
+        |  |     +--ro action-mappings* [value]
+        |  |     |  +--ro value      binary
+        |  |     |  +--ro meaning?   action-type
+        |  |     +--ro port-mappings* [value]
+        |  |     |  +--ro value    binary
+        |  |     |  +--ro port?    if:interface-ref
+        |  |     +--ro direction-mappings* [value]
+        |  |     |  +--ro value        binary
+        |  |     |  +--ro direction?   direction-type
+        |  |     +--ro timestamp
+        |  |     |  +--ro seconds?       uint32
+        |  |     |  +--ro nanoseconds?   uint32
+        |  |     +--ro payload-contents?     frame-headers
+        |  +--ro filters* [name]
+        |     +--ro name             string
+        |     +--ro interfaces* [int]
+        |     |  +--ro int    if:interface-ref
+        |     +--ro actions* [action]
+        |     |  +--ro action    action-type
+        |     +--ro directions* [direction]
+        |     |  +--ro direction    direction-type
+        |     +--ro type             filter-type
+        |     +--ro ipv4-address?    inet:ipv4-address-no-zone
+        |     +--ro ipv6-address?    inet:ipv6-address-no-zone
+        |     +--ro version?         inet:ip-version
+        |     +--ro frame-payload
+        |     |  +--ro offset?   uint16
+        |     |  +--ro match?    binary
+        |     +--ro frame-length?    uint16
+        +--rw proposal-error?      string
+        +--rw proposal-selected?   uint32
+        +--rw install-error?       string
