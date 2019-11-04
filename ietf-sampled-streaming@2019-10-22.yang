@@ -388,34 +388,30 @@ module ietf-sampled-streaming {
         description
           "Will include the outer Ethernet source MAC.";
       }
-      bit eth-l2-ovlan {
+      bit eth-l2-vlan {
         position 4;
         description
-          "Will include any outer 802.1Q VLAN tag.";
-      }
-      bit eth-l2-ivlan {
-        position 5;
-        description
-          "Will include any inner 802.1ad QinQ VLAN tag.";
+          "Will include any 802.1Q-2018 VLAN tags.";
       }
       bit eth-l2-type {
-        position 6;
+        position 5;
         description
           "Will include the Ethertype or size.";
       }
       bit eth-l2-fcs {
-        position 7;
+        position 6;
         description
           "Will include the Frame Check Sequence after the
            payload.";
       }
       bit eth-l1-ipg {
-        position 8;
+        position 7;
         description
-          "Will include the 12 octet inter-packet gap.";
+          "Will include the inter-packet gap.  Be aware that
+           different Ethernet speeds may have different lengths.";
       }
       bit mpls-tags {
-        position 9;
+        position 8;
         description
           "Will include MPLS tags.";
       }

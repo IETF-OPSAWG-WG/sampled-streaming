@@ -2,9 +2,9 @@
 
 
 
-Internet Engineering Task Force                             A. Gray, Ed.
+Internet Engineering Task Force                                  A. Gray
 Internet-Draft                                    Charter Communications
-Intended status: Informational                          L.J. Wobker, Ed.
+Intended status: Informational                               L.J. Wobker
 Expires: 7 May 2020                                        Cisco Systems
                                                          4 November 2019
 
@@ -19,15 +19,15 @@ Abstract
    traffic, and 2) receiving metadata information from the network
    element about these packet samples, and the structure of said stream
    metadata.  A main design requirement is to provide network elements
-   with widely varying capabilities (e.g.  ASICs, NPUs, NICs, vSwitches,
+   with widely varying capabilities (e.g., ASICs, NPUs, NICs, vSwitches,
    CPUs) a mechanism to sample and export packets at high rates, by
-   allowing communication of the specific bit formats of headers applied
-   to the packet flow, in a way that enhances interoperability between
-   traffic sources and sinks.  Historically, Netflow and similar
-   mechanisms have been used for these use cases; however, the
-   increasing packet rates of very high-speed devices and increasing
-   variance in the information available to data planes lends itself to
-   both a less-prescriptive set of packet formats as well as a
+   allowing communication of the specific bit formats of internal data
+   headers applied to the packet flow, in a way that enhances
+   interoperability between traffic sources and sinks.  Historically,
+   Netflow and similar mechanisms have been used for these use cases;
+   however, the increasing packet rates of very high-speed devices and
+   increasing variance in the information available to data planes lends
+   itself to both a less-prescriptive set of packet formats as well as a
    decoupling of the sampling action from the collection and analysis
    mechanisms.
 
@@ -79,9 +79,9 @@ Table of Contents
      1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
      1.3.  Motivation for Disaggregation of Telemetry  . . . . . . .   3
    2.  Use Cases . . . . . . . . . . . . . . . . . . . . . . . . . .   4
-     2.1.  Use Case 1 : Traffic Analytics  . . . . . . . . . . . . .   5
-     2.2.  Use Case 2 : Network Behavior Verification  . . . . . . .   5
-     2.3.  Use Case 3 : Standardization  . . . . . . . . . . . . . .   6
+     2.1.  Use Case 1: Traffic Analytics . . . . . . . . . . . . . .   5
+     2.2.  Use Case 2: Network Behavior Verification . . . . . . . .   5
+     2.3.  Use Case 3: Standardization . . . . . . . . . . . . . . .   6
      2.4.  Use Case 4: Security Automation . . . . . . . . . . . . .   6
    3.  Stream Setup  . . . . . . . . . . . . . . . . . . . . . . . .   7
      3.1.  Client queries Replicator for Points  . . . . . . . . . .   7
@@ -98,7 +98,7 @@ Table of Contents
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  15
    Appendix A.  Yang Model Tree Reference  . . . . . . . . . . . . .  15
    Appendix B.  Yang Model . . . . . . . . . . . . . . . . . . . . .  17
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  36
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  35
 
 1.  Introduction
 
@@ -144,9 +144,9 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    generation for network elements, while at the same time separating
    the sampling mechanism itself from specific analysis or transport
    protocols.  If we separate the component functions of how these
-   problems have been traditionally solved, we see that these functions
-   lend themselves to being viewed as a layered stack such as the one in
-   the figure:
+   problems have been traditionally solved, these functions lend
+   themselves to being viewed as a layered stack such as the one in the
+   figure:
 
    Figure: Packet sampling and analysis viewed as a layered stack
 
@@ -172,10 +172,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
    |        Analysis         |   Higher level applications perform
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+   further analysis on aggregated data
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+   further analysis on aggregated samples
                ^^
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |  Collection / Decoding  |   Sample arrives at collector, decoded,
+   |  Collection / Decoding  |   Samples arrives at Receiver, decoded,
    +-+-+-+-+-+-+-+-+-+-+-+-+-+   optionally stored/aggregated
                ^^
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -183,8 +183,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    +-+-+-+-+-+-+-+-+-+-+-+-+-+  send via configured transport protocol
                ^^
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |  Sampling / Metadata    |  Replicator samples, filters packets from
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+  stream, appends metadata
+   |  Sampling / Metadata    |  Samples filters packets at a fixed
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+  ratio from stream, appends metadata
                ^^
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
    |  Data Plane Forwarding  |  Stream of data packets moving through
@@ -194,18 +194,17 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
                                   Figure 1
 
    The primary advantage of the stack model is the ability to
-   disaggregate or abstract functions from each other.  For example,
-   providing a self-describing, flexible format for the metadata
-   abstracts the data plane -- in other words the upper layers do not
-   need to know how many bits wide a metadata field is, they only need
-   to know that it is present and the semantics.  Separating the
-   transport function allows for multiple use cases: a router wishing to
-   sample packets for internal consumption within the same system might
-   use a locally defined (perhaps even proprietary) transport header,
-   while putting the sampled metadata and packet into a UDP packet
-   allows for it to be transported to any IP-reachable collector,
-   regardless of the geographic or topological distance from the
-   Replicator itself.
+   disaggregate functions from each other.  For example, providing a
+   self-describing, flexible format for the metadata abstracts the data
+   plane -- in other words the upper layers do not need to know how many
+   bits wide a metadata field is, they only need to know that it is
+   present and the semantics.  Separating the transport function allows
+   for multiple use cases: a router wishing to sample packets for
+   internal consumption within the same system might use a locally
+   defined (perhaps even proprietary) transport header, while putting
+   the sampled metadata and packet into a UDP packet allows for it to be
+   transported to any IP-reachable collector, regardless of the
+   geographic or topological distance from the Replicator itself.
 
    This document standardizes the "Sampling / Metadata" and "Export /
    Transport" components of the above stack.
@@ -221,12 +220,13 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
 
+
 Gray & Wobker              Expires 7 May 2020                   [Page 4]
 
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-2.1.  Use Case 1 : Traffic Analytics
+2.1.  Use Case 1: Traffic Analytics
 
    Operators typically use a mix of NetFlow, IPFIX, and inline traffic
    samplers spread throughout the network to gather data for analytics.
@@ -253,7 +253,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    scalable platforms rather than being constrained to the compute and
    storage capabilities of a local network element.
 
-2.2.  Use Case 2 : Network Behavior Verification
+2.2.  Use Case 2: Network Behavior Verification
 
    This use case focuses on the potential ability to have the ASICs
    stream discarded packets, along with an indication as to the reason
@@ -282,7 +282,7 @@ Gray & Wobker              Expires 7 May 2020                   [Page 5]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-2.3.  Use Case 3 : Standardization
+2.3.  Use Case 3: Standardization
 
    Standardizing the way these data streams are formed and communicated
    between the Replicators, Clients, and Receivers in a fashion that
@@ -301,7 +301,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    this data is exchanged between the Replicator, Client, and Receiver
    at the initialization of the session.  The motivation for such
    latitude in encoding and sizing is quite intentional, as it permits
-   widely varying capabilities within the replicators.
+   widely varying capabilities within the Replicators.
 
 2.4.  Use Case 4: Security Automation
 
@@ -531,12 +531,14 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 3.5.  Ending sampling and cleanup
 
    When a Client is finished with a sampling session, it deletes its
-   entry in the samplers list to terminate a sampling session.
+   entry in the 'samplers' tree to terminate a sampling session.
    Otherwise, a Client MUST refresh its entry by setting 'client-
-   heartbeat' to 0 at least every 3600 seconds.  If 'client-heartbeat'
-   exceeds 3600, the Replicator SHOULD consider the sampling
-   configuration and any associated sampling session no longer
-   necessary, terminate the sampling, and delete the entry.
+   heartbeat' to 0 at least every 3600 seconds.  The 'client-heartbeat'
+   is then incremented by the Replicator.  If 'client-heartbeat' exceeds
+   3600, the Replicator SHOULD consider the sampling configuration and
+   any associated sampling session no longer necessary, terminate the
+   sampling, and delete the entry.  A Replicator MAY allow configuration
+   to increase this timeout.
 
 4.  Data Stream Format
 
@@ -555,8 +557,6 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
 
-
-
 Gray & Wobker              Expires 7 May 2020                  [Page 10]
 
 Internet-Draft          Sampled Traffic Streaming          November 2019
@@ -564,7 +564,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
    There is one captured packet per encapsulated packet, and thus the
    outer encapsulation length can be used to deduce the length of one
-   variable-length field (designed by a field length of 0) contained
+   variable-length field (designated by a field length of 0) contained
    within.  If there is more than one variable-length field, a matching
    "-size"; field type MUST be provided for all but one of the variable-
    length fields (as a single variable length can be deduced from the
@@ -601,15 +601,15 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    This non-normative example may be associated with a stream-format as
    per the following table:
 
-
-
-
-
-
-
-
-
-
+   +-----------+-------+------------------------+----------------------+
+   | Field     | Field | Field Type             | Field Type-Data      |
+   | Name      | Size  |                        |                      |
+   +===========+=======+========================+======================+
+   | Incoming  | 8     | port-ingress           | A listing of         |
+   | port      |       |                        | values that may be   |
+   |           |       |                        | seen in this         |
+   |           |       |                        | field, mapped to     |
+   |           |       |                        | interface-refs       |
 
 
 
@@ -618,29 +618,23 @@ Gray & Wobker              Expires 7 May 2020                  [Page 11]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-   +-----------+-------+------------------------+----------------------+
-   | Field     | Field | Field Type             | Field Type-Data      |
-   | Name      | Size  |                        |                      |
-   +===========+=======+========================+======================+
-   | Incoming  | 8     | port-ingress           | A listing of values  |
-   | port      |       |                        | that may be seen in  |
-   |           |       |                        | this field, mapped   |
-   |           |       |                        | to interface-refs    |
    |           |       |                        | from [RFC8343].      |
    +-----------+-------+------------------------+----------------------+
    | Timestamp | 24    | timestamp-nsec-ingress | Two 32-bit numbers   |
-   |           |       |                        | giving when the "0"  |
-   |           |       |                        | of this field is     |
-   |           |       |                        | based off of, using  |
-   |           |       |                        | the PTP Truncated    |
+   |           |       |                        | giving when the      |
+   |           |       |                        | "0" of this field    |
+   |           |       |                        | is based off of,     |
+   |           |       |                        | using the PTP        |
+   |           |       |                        | Truncated            |
    |           |       |                        | Timestamp format.    |
    +-----------+-------+------------------------+----------------------+
-   | Act       | 2     | action                 | A listing of values  |
-   |           |       |                        | that may be seen in  |
-   |           |       |                        | this field, mapped   |
-   |           |       |                        | to action types      |
-   |           |       |                        | (accepted, dropped,  |
-   |           |       |                        | etc.)                |
+   | Act       | 2     | action                 | A listing of         |
+   |           |       |                        | values that may be   |
+   |           |       |                        | seen in this         |
+   |           |       |                        | field, mapped to     |
+   |           |       |                        | action types         |
+   |           |       |                        | (accepted,           |
+   |           |       |                        | dropped, etc.)       |
    +-----------+-------+------------------------+----------------------+
    | Frame     | 17    | frame-length-ingress   | Note that this       |
    | Length    |       |                        | denotes the          |
@@ -650,8 +644,16 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    |           |       |                        | not include the      |
    |           |       |                        | entire payload.      |
    +-----------+-------+------------------------+----------------------+
-   | Internal  | 13    | padding                |                      |
-   | Data 1    |       |                        |                      |
+   | Internal  | 13    | padding                | Note that this may   |
+   | Data 1    |       |                        | be ASIC-internal-    |
+   |           |       |                        | only data, or some   |
+   |           |       |                        | other information    |
+   |           |       |                        | that would be        |
+   |           |       |                        | expensive to prune   |
+   |           |       |                        | out.  'padding'      |
+   |           |       |                        | fields MUST have     |
+   |           |       |                        | all content          |
+   |           |       |                        | ignored.             |
    +-----------+-------+------------------------+----------------------+
    | Payload   | 0     | frame-payload-ingress  |                      |
    +-----------+-------+------------------------+----------------------+
@@ -662,8 +664,6 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    [I-D.tuexen-opsawg-pcapng] enhanced packet block (EPB) format (and
    thus, this Replicator may in fact be a server offering a tcpdump-
    based backend using this frontend):
-
-
 
 
 
@@ -1382,17 +1382,17 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            description
              "Will include the outer Ethernet source MAC.";
          }
-         bit eth-l2-ovlan {
+         bit eth-l2-vlan {
            position 4;
            description
-             "Will include any outer 802.1Q VLAN tag.";
-         }
-         bit eth-l2-ivlan {
-           position 5;
-           description
-             "Will include any inner 802.1ad QinQ VLAN tag.";
+             "Will include any 802.1Q-2018 VLAN tags.";
          }
          bit eth-l2-type {
+           position 5;
+           description
+             "Will include the Ethertype or size.";
+         }
+         bit eth-l2-fcs {
            position 6;
 
 
@@ -1403,21 +1403,17 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
            description
-             "Will include the Ethertype or size.";
-         }
-         bit eth-l2-fcs {
-           position 7;
-           description
              "Will include the Frame Check Sequence after the
               payload.";
          }
          bit eth-l1-ipg {
-           position 8;
+           position 7;
            description
-             "Will include the 12 octet inter-packet gap.";
+             "Will include the inter-packet gap.  Be aware that
+              different Ethernet speeds may have different lengths.";
          }
          bit mpls-tags {
-           position 9;
+           position 8;
            description
              "Will include MPLS tags.";
          }
@@ -1450,6 +1446,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
        list actions {
          when "../type = 'action'";
          key "action";
+         description
+           "Filter down to only this list of actions.";
+         leaf action {
+           type action-type;
 
 
 
@@ -1458,10 +1458,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 26]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-         description
-           "Filter down to only this list of actions.";
-         leaf action {
-           type action-type;
            description
              "One specific action code.";
          }
@@ -1506,6 +1502,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          description
            "Frame payload fragment to match on.";
          leaf offset {
+           type uint16;
+           description
+             "Offset in octets from the start of the frame to begin the
+              match on.";
 
 
 
@@ -1514,10 +1514,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 27]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           type uint16;
-           description
-             "Offset in octets from the start of the frame to begin the
-              match on.";
          }
          leaf match {
            type binary;
@@ -1562,6 +1558,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
          leaf type {
            type field-type;
            description
+             "The type of this data.";
+         }
+         list action-mappings {
+           when "../type='action'";
 
 
 
@@ -1570,10 +1570,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 28]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-             "The type of this data.";
-         }
-         list action-mappings {
-           when "../type='action'";
            key "value";
            description
              "The mapping of values to action-type codes, valid for
@@ -1618,6 +1614,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
                "The value that will appear in the header.";
            }
            leaf direction {
+             type direction-type;
+             description
+               "The direction the traffic in respect to the port.";
+           }
 
 
 
@@ -1626,10 +1626,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 29]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-             type direction-type;
-             description
-               "The direction the traffic in respect to the port.";
-           }
          }
          container timestamp {
            when "../type='timestamp-nsec' | ../type='timestamp-usec' |
@@ -1674,6 +1670,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
           those points.";
        leaf name {
          type string {
+           length "1..255";
+         }
+         description
+           "The name of this capture point.";
 
 
 
@@ -1682,10 +1682,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 30]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-           length "1..255";
-         }
-         description
-           "The name of this capture point.";
        }
        list interfaces {
          config false;
@@ -1730,6 +1726,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
             this point can provide.";
        }
        leaf max-samplers {
+         type uint32;
+         config false;
+         description
+           "The maximum number of additional samplers that can be
 
 
 
@@ -1738,10 +1738,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 31]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-         type uint32;
-         config false;
-         description
-           "The maximum number of additional samplers that can be
             installed at this point.";
        }
        leaf max-filters {
@@ -1786,6 +1782,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
            type uint32;
            mandatory true;
            description
+             "The number of seconds since the Client has refreshed this
+              request.  The Client MUST only be able to set this value
+              to 0, the Replicator MUST keep track of it, and SHOULD
+              delete this entry when it reaches 3600.";
 
 
 
@@ -1794,10 +1794,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 32]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-             "The number of seconds since the Client has refreshed this
-              request.  The Client MUST only be able to set this value
-              to 0, the Replicator MUST keep track of it, and SHOULD
-              delete this entry when it reaches 3600.";
          }
          container destination {
            description
@@ -1842,6 +1838,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              }
              mandatory true;
              description
+               "The requested sampling ratio (1:N, with N being this
+                value).";
+           }
+           leaf min-ratio {
 
 
 
@@ -1850,10 +1850,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 33]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-               "The requested sampling ratio (1:N, with N being this
-                value).";
-           }
-           leaf min-ratio {
              type uint32 {
                range "1..max";
              }
@@ -1898,6 +1894,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
              type uint16 {
                range "0..10000";
              }
+             description
+               "The performance penalty amount, in hundredths of a
+                percent.  This value is not required even if
+                performance-penalty is true.  If present, it MUST be
 
 
 
@@ -1906,10 +1906,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 34]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-             description
-               "The performance penalty amount, in hundredths of a
-                percent.  This value is not required even if
-                performance-penalty is true.  If present, it MUST be
                 treated as an estimate.";
            }
            container stream-format {
@@ -1953,7 +1949,11 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
      }
    }
 
+Authors' Addresses
 
+   Andrew Gray
+   Charter Communications
+   8560 Upland Drive, Suite B
 
 
 
@@ -1962,11 +1962,6 @@ Gray & Wobker              Expires 7 May 2020                  [Page 35]
 Internet-Draft          Sampled Traffic Streaming          November 2019
 
 
-Authors' Addresses
-
-   Andrew Gray (editor)
-   Charter Communications
-   8560 Upland Drive, Suite B
    Englewood, CO 80112
    United States of America
 
@@ -1974,7 +1969,7 @@ Authors' Addresses
    Email: Andrew.Gray@charter.com
 
 
-   Lawrence J Wobker (editor)
+   Lawrence J Wobker
    Cisco Systems
    170 W Tasman Drive
    San Jose, CA 95134
@@ -1982,6 +1977,11 @@ Authors' Addresses
 
    Phone: +1 984 216 1860
    Email: lwobker@cisco.com
+
+
+
+
+
 
 
 

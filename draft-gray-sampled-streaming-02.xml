@@ -42,7 +42,7 @@
   <!-- ***** FRONT MATTER ***** -->
   <front>
     <title>Sampled Traffic Streaming</title>
-    <author fullname="Andrew Gray" initials="A." role="editor" surname="Gray">
+    <author fullname="Andrew Gray" initials="A." surname="Gray">
       <organization>Charter Communications</organization>
       <address>
         <postal>
@@ -56,7 +56,7 @@
         <email>Andrew.Gray@charter.com</email>
       </address>
     </author>
-    <author fullname="Lawrence J Wobker" initials="L.J." role="editor" surname="Wobker">
+    <author fullname="Lawrence J Wobker" initials="L.J." surname="Wobker">
       <organization>Cisco Systems</organization>
       <address>
         <postal>
@@ -82,7 +82,7 @@
     <workgroup>Internet Engineering Task Force</workgroup>
     <keyword>template</keyword>
     <abstract>
-      <t>This document standardizes both 1) a means of requesting a stream of packet samples from any device generating, routing, or forwarding traffic, and 2) receiving metadata information from the network element about these packet samples, and the structure of said stream metadata.  A main design requirement is to provide network elements with widely varying capabilities (e.g. ASICs, NPUs, NICs, vSwitches, CPUs) a mechanism to sample and export packets at high rates, by allowing communication of the specific bit formats of headers applied to the packet flow, in a way that enhances interoperability between traffic sources and sinks.  Historically, Netflow and similar mechanisms have been used for these use cases; however, the increasing packet rates of very high-speed devices and increasing variance in the information available to data planes lends itself to both a less-prescriptive set of packet formats as well as a decoupling of the sampling action from the collection and analysis mechanisms.
+      <t>This document standardizes both 1) a means of requesting a stream of packet samples from any device generating, routing, or forwarding traffic, and 2) receiving metadata information from the network element about these packet samples, and the structure of said stream metadata.  A main design requirement is to provide network elements with widely varying capabilities (e.g., ASICs, NPUs, NICs, vSwitches, CPUs) a mechanism to sample and export packets at high rates, by allowing communication of the specific bit formats of internal data headers applied to the packet flow, in a way that enhances interoperability between traffic sources and sinks.  Historically, Netflow and similar mechanisms have been used for these use cases; however, the increasing packet rates of very high-speed devices and increasing variance in the information available to data planes lends itself to both a less-prescriptive set of packet formats as well as a decoupling of the sampling action from the collection and analysis mechanisms.
       </t>
     </abstract>
   </front>
@@ -104,17 +104,17 @@
         </t>
       </section>
 	  <section title="Motivation for Disaggregation of Telemetry">
-	    <t>A key concept for this proposal is to enable very high rate sample generation for network elements, while at the same time separating the sampling mechanism itself from specific analysis or transport protocols.  If we separate the component functions of how these problems have been traditionally solved, we see that these functions lend themselves to being viewed as a layered stack such as the one in the figure:</t>
+	    <t>A key concept for this proposal is to enable very high rate sample generation for network elements, while at the same time separating the sampling mechanism itself from specific analysis or transport protocols.  If we separate the component functions of how these problems have been traditionally solved, these functions lend themselves to being viewed as a layered stack such as the one in the figure:</t>
 	  	<figure align="center" anchor="telemetry_stack">
 	  	  <preamble>Figure: Packet sampling and analysis viewed as a layered stack</preamble>
 		    <artwork>
           <![CDATA[
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
 |        Analysis         |   Higher level applications perform  
-+-+-+-+-+-+-+-+-+-+-+-+-+-+   further analysis on aggregated data
++-+-+-+-+-+-+-+-+-+-+-+-+-+   further analysis on aggregated samples
             ^^
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Collection / Decoding  |   Sample arrives at collector, decoded, 
+|  Collection / Decoding  |   Samples arrives at Receiver, decoded, 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+   optionally stored/aggregated
             ^^
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -122,8 +122,8 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+  send via configured transport protocol
             ^^
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Sampling / Metadata    |  Replicator samples, filters packets from 
-+-+-+-+-+-+-+-+-+-+-+-+-+-+  stream, appends metadata
+|  Sampling / Metadata    |  Samples filters packets at a fixed  
++-+-+-+-+-+-+-+-+-+-+-+-+-+  ratio from stream, appends metadata
             ^^
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
 |  Data Plane Forwarding  |  Stream of data packets moving through 
@@ -131,24 +131,24 @@
 ]]>
         </artwork>
       </figure>
-      <t>The primary advantage of the stack model is the ability to disaggregate or abstract functions from each other.  For example, providing a self-describing, flexible format for the metadata abstracts the data plane -- in other words the upper layers do not need to know how many bits wide a metadata field is, they only need to know that it is present and the semantics.  Separating the transport function allows for multiple use cases: a router wishing to sample packets for internal consumption within the same system might use a locally defined (perhaps even proprietary) transport header, while putting the sampled metadata and packet into a UDP packet allows for it to be transported to any IP-reachable collector, regardless of the geographic or topological distance from the Replicator itself.</t>
+      <t>The primary advantage of the stack model is the ability to disaggregate functions from each other.  For example, providing a self-describing, flexible format for the metadata abstracts the data plane -- in other words the upper layers do not need to know how many bits wide a metadata field is, they only need to know that it is present and the semantics.  Separating the transport function allows for multiple use cases: a router wishing to sample packets for internal consumption within the same system might use a locally defined (perhaps even proprietary) transport header, while putting the sampled metadata and packet into a UDP packet allows for it to be transported to any IP-reachable collector, regardless of the geographic or topological distance from the Replicator itself.</t>
 	   <t>This document standardizes the "Sampling / Metadata" and "Export / Transport" components of the above stack.</t>
     </section>
 	</section>
 	<section title="Use Cases">
 	  <t>This document is designed around the following current and foreseeable use cases that operators have today.</t>
-      <section title="Use Case 1 : Traffic Analytics">
+      <section title="Use Case 1: Traffic Analytics">
         <t>Operators typically use a mix of NetFlow, IPFIX, and inline traffic samplers spread throughout the network to gather data for analytics.  With the next generation of hardware, 400Gb/s interfaces are becoming available, with higher data rates under development in their respective standards bodies.  This will require at least an augmentation of any inline traffic samplers, which are quite expensive.  Additionally, the pace of growth in the data plane is outgrowing the pace of growth of the control plane.  This is especially visible with relatively control plane or CPU-heavy protocols such as NetFlow, where current sampling rates are simply not going to be sustainable long-term, primarily due to on-box control plane hardware limitations.  Being able to capture a filtered, sampled collection of actual packets throughout the network is very valuable for understanding how the network is being used, to provide hard data to justify network topology augments and/or technology changes.</t>
         <t>This proposal addresses this use case by: 1) making the data replication mechanism as simple as possible, reducing the need for high levels of complexity in the data plane; 2) decoupling the sampling/collection of packets from the analysis, which in turn allows for the analysis to be performed on distributed, horizontally-scalable platforms rather than being constrained to the compute and storage capabilities of a local network element.
         </t>
       </section>
-      <section title="Use Case 2 : Network Behavior Verification">
+      <section title="Use Case 2: Network Behavior Verification">
         <t>This use case focuses on the potential ability to have the ASICs stream discarded packets, along with an indication as to the reason for the drop.  With fields denoting the reason for dropped packets such as QoS policies, buffer contention, ACLs, etc., such discarded traffic could be streamed (potentially at a sampling rate of 1:1, i.e. every packet) off-box for analysis to determine if the observed behavior was expected, or trigger alerts that QoS policies may be having adverse effects on the network.  The ability to include the packet payload provides additional context, allowing examination of the platform behavior and affected policies.</t>
         <t>This proposal addresses this use case by allowing samplers which have such capabilities to communicate to the receiver: 1) drop codes(reasons) that are known, 2) the semantics of those codes, and 3) the specific bit formats for the receiver to use when decoding.</t>
       </section>
-      <section title="Use Case 3 : Standardization">
+      <section title="Use Case 3: Standardization">
         <t>Standardizing the way these data streams are formed and communicated between the Replicators, Clients, and Receivers in a fashion that allows vendors flexibility in what work the ASIC has to do to support sampled streaming (by allowing communicating of an extremely dynamic header in a manner than control planes can manage) allows systems to be used between all platforms in an interoperable fashion.  The alternative is to build independent systems for each packet replication solution that may end up being developed, resulting in much higher costs for an overall solution.</t>
-        <t>This proposal addresses this use case by allowing the sampled packet header to provide varying metadata fields, without mandating specific positions or widths.  This arrangement of fields and their format is a function of the Replicator, and information about how to handle this data is exchanged between the Replicator, Client, and Receiver at the initialization of the session.  The motivation for such latitude in encoding and sizing is quite intentional, as it permits widely varying capabilities within the replicators.</t>
+        <t>This proposal addresses this use case by allowing the sampled packet header to provide varying metadata fields, without mandating specific positions or widths.  This arrangement of fields and their format is a function of the Replicator, and information about how to handle this data is exchanged between the Replicator, Client, and Receiver at the initialization of the session.  The motivation for such latitude in encoding and sizing is quite intentional, as it permits widely varying capabilities within the Replicators.</t>
       </section>
       <section title="Use Case 4: Security Automation">
         <t>An automated security platform can utilize this proposal to set up a "normal security analysis" stream at a very low sampling rate (for example, 1 in 20,000) for constant monitoring at various points throughout the network.  Upon seeing something it deems 'interesting', or by manual input, it can add in an additional, targeted, stream, at a very high sampling rate (potentially 1:1) for detailed analysis and mitigation efforts.</t>
@@ -208,12 +208,12 @@
         </ul></t>
       </section>
       <section title="Ending sampling and cleanup">
-        <t>When a Client is finished with a sampling session, it deletes its entry in the samplers list to terminate a sampling session.  Otherwise, a Client MUST refresh its entry by setting 'client-heartbeat' to 0 at least every 3600 seconds.  If 'client-heartbeat' exceeds 3600, the Replicator SHOULD consider the sampling configuration and any associated sampling session no longer necessary, terminate the sampling, and delete the entry.</t>
+        <t>When a Client is finished with a sampling session, it deletes its entry in the 'samplers' tree to terminate a sampling session.  Otherwise, a Client MUST refresh its entry by setting 'client-heartbeat' to 0 at least every 3600 seconds.  The 'client-heartbeat' is then incremented by the Replicator.  If 'client-heartbeat' exceeds 3600, the Replicator SHOULD consider the sampling configuration and any associated sampling session no longer necessary, terminate the sampling, and delete the entry.  A Replicator MAY allow configuration to increase this timeout.</t>
       </section>
     </section>
     <section title="Data Stream Format" anchor="ds_format">
       <t>After the stream setup has been completed, the Receiver MUST use the stream-format data that the Replicator has calculated in its proposal.  The Client and Receiver MUST NOT assume that the stream-format data is consistent between one stream setup and any other (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the payload is always at the end (it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  The stream-format data provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.</t>
-      <t>There is one captured packet per encapsulated packet, and thus the outer encapsulation length can be used to deduce the length of one variable-length field (designed by a field length of 0) contained within.  If there is more than one variable-length field, a matching "-size"; field type MUST be provided for all but one of the variable-length fields (as a single variable length can be deduced from the wrapper length).</t>
+      <t>There is one captured packet per encapsulated packet, and thus the outer encapsulation length can be used to deduce the length of one variable-length field (designated by a field length of 0) contained within.  If there is more than one variable-length field, a matching "-size"; field type MUST be provided for all but one of the variable-length fields (as a single variable length can be deduced from the wrapper length).</t>
       <t>This means there is no normative packet format or data layout - a large point of this specification is to allow that packet format to be negotiated and decided between the Client and Replicator, with the information passed back via the stream-format data.</t>
       <t>One example of what the resulting packet may look like (but not a normative listing of what it is - the actual format can be any combination of fields, of any size, in any order), the data inside the resulting data stream after the UDP tunnel header may look like the following:</t>
       <figure align="center" anchor="expl_payload">
@@ -243,7 +243,7 @@
         <c>Timestamp</c><c>24</c><c>timestamp-nsec-ingress</c><c>Two 32-bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
         <c>Act</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
         <c>Frame Length</c><c>17</c><c>frame-length-ingress</c><c>Note that this denotes the original frame length - the payload field MAY not include the entire payload.</c>
-        <c>Internal Data 1</c><c>13</c><c>padding</c><c/>
+        <c>Internal Data 1</c><c>13</c><c>padding</c><c>Note that this may be ASIC-internal-only data, or some other information that would be expensive to prune out.  'padding' fields MUST have all content ignored.</c>
         <c>Payload</c><c>0</c><c>frame-payload-ingress</c><c/>
       </texttable>
       <t>Another non-normative example, which is similar to the <xref target="I-D.tuexen-opsawg-pcapng"/> enhanced packet block (EPB) format (and thus, this Replicator may in fact be a server offering a tcpdump-based backend using this frontend):</t>
