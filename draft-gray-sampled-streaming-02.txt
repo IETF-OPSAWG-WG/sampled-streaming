@@ -14,20 +14,20 @@ Expires: 7 May 2020                                        Cisco Systems
 
 Abstract
 
-   This document standardizes the following both 1) a means of
-   requesting a stream of packet samples from any device generating,
-   routing, or forwarding traffic, and 2) receiving metadata information
-   from the network element about these packet samples, and the
-   structure of said stream metadata.  This is designed to provide even
-   network elements with widely varying capabilities (e.g.  ASICs, NPUs,
-   NICs, vSwitches, CPUs) a mechanism to sample and export packets at
-   high rates, by allowing communication of the specific bit formats of
-   headers applied to the packet flow, in a way that enhances
-   interoperability between traffic sources and sinks.  Historically,
-   Netflow and similar mechanisms have been used for these use cases;
-   however the increasing packet rates of very high speed devices and
-   increasing variance in the information available to data planes lends
-   itself to both a less-prescriptive set of packet formats as well as a
+   This document standardizes both 1) a means of requesting a stream of
+   packet samples from any device generating, routing, or forwarding
+   traffic, and 2) receiving metadata information from the network
+   element about these packet samples, and the structure of said stream
+   metadata.  A main design requirement is to provide network elements
+   with widely varying capabilities (e.g.  ASICs, NPUs, NICs, vSwitches,
+   CPUs) a mechanism to sample and export packets at high rates, by
+   allowing communication of the specific bit formats of headers applied
+   to the packet flow, in a way that enhances interoperability between
+   traffic sources and sinks.  Historically, Netflow and similar
+   mechanisms have been used for these use cases; however, the
+   increasing packet rates of very high speed devices and increasing
+   variance in the information available to data planes lends itself to
+   both a less-prescriptive set of packet formats as well as a
    decoupling of the sampling action from the collection and analysis
    mechanisms.
 
@@ -88,7 +88,7 @@ Table of Contents
      3.2.  Client submits a request to the Replicator  . . . . . . .   8
      3.3.  Replicator offers Proposals . . . . . . . . . . . . . . .   8
      3.4.  Client selects a Proposal . . . . . . . . . . . . . . . .  10
-     3.5.  Endding sampling and cleanup  . . . . . . . . . . . . . .  10
+     3.5.  Ending sampling and cleanup . . . . . . . . . . . . . . .  10
    4.  Data Stream Format  . . . . . . . . . . . . . . . . . . . . .  10
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
@@ -118,7 +118,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-   document are to be interpreted as described in RFC 2119 [RFC2119] .
+   document are to be interpreted as described in RFC 2119 [RFC2119].
 
 1.2.  Terminology
 
@@ -132,8 +132,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
       as requested by a Client, and sending the resulting replicated
       packet stream to a Receiver.
 
-      Point: The location inside the Replicator (e.g, a forwarding ASIC)
-      that performs the actual packet replication.  There may be
+      Point: The location inside the Replicator (e.g., a forwarding
+      ASIC) that performs the actual packet replication.  There may be
       multiple physical interfaces serviced by one Point, or one
       interface may be serviced by multiple Points, that may have
       different capabilities.
@@ -187,8 +187,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    +-+-+-+-+-+-+-+-+-+-+-+-+-+  stream, appends metadata
                ^^
    +-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |  Dataplane Forwarding   |  Stream of data packets moving through
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+  element dataplane
+   |  Data Plane Forwarding  |  Stream of data packets moving through
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+  element data plane
 
 
                                   Figure 1
@@ -202,18 +202,18 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    transport function allows for multiple use cases: a router wishing to
    sample packets for internal consumption within the same system might
    use a locally defined (perhaps even proprietary) transport header,
-   while putting the sampled metadata+packet into a UDP packet allows
-   for it to be transported to any IP-reachable collector, regardless of
-   the geographic or topological distance from the Replicator itself.
+   while putting the sampled metadata and packet into a UDP packet
+   allows for it to be transported to any IP-reachable collector,
+   regardless of the geographic or topological distance from the
+   Replicator itself.
 
    This document standardizes the "Sampling / Metadata" and "Export /
    Transport" components of the above stack.
 
 2.  Use Cases
 
-   This document is designed around the following current and forseeable
-   use cases that operators have today.
-
+   This document is designed around the following current and
+   foreseeable use cases that operators have today.
 
 
 
@@ -296,12 +296,12 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
    This proposal addresses this use case by allowing the sampled packet
    header to provide varying metadata fields, without mandating specific
-   positions or widths.  These fields and their format is a function of
-   the Replicator, and information about how to handle this data is
-   exchanged between the Replicator, Client, and Receiver at the
-   initialization of the session.  The motivation for such latitude in
-   encoding and sizing is quite intentional, as it permits widely
-   varying capabilities within the replicators.
+   positions or widths.  This arrangement of fields and their format is
+   a function of the Replicator, and information about how to handle
+   this data is exchanged between the Replicator, Client, and Receiver
+   at the initialization of the session.  The motivation for such
+   latitude in encoding and sizing is quite intentional, as it permits
+   widely varying capabilities within the replicators.
 
 2.4.  Use Case 4: Security Automation
 
@@ -310,8 +310,8 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    example, 1 in 20,000) for constant monitoring at various points
    throughout the network.  Upon seeing something it deems
    'interesting', or by manual input, it can add in an additional,
-   targeted, stream, at a very high sampling rate (potentionally 1:1)
-   for detailed analysis and mitigation efforts.
+   targeted, stream, at a very high sampling rate (potentially 1:1) for
+   detailed analysis and mitigation efforts.
 
    Examples of past incidents where this may have been useful are the
    NTP MONLIST attacks, DNS attacks, or DDoS attacks (although 1:1 would
@@ -353,10 +353,10 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    configurations via the 'points' branch, which provides the following
    information:
 
-   *  'name' - The name of the Point.  This services as a key, and
-      SHOULD NOT be interpreted as anything other than a uniquely
-      identifying value.  A Replicator MAY choose to use an internal
-      path, an encoded address, or any other value of its choosing.
+   *  'name' - The name of the Point.  This serves as a key, and SHOULD
+      NOT be interpreted as anything other than a uniquely identifying
+      value.  A Replicator MAY choose to use an internal path, an
+      encoded address, or any other value of its choosing.
 
    *  'interfaces' - The physical interfaces this Point is servicing.  A
       Replicator MAY offer the same interfaces under different Points,
@@ -455,7 +455,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    detailed below.
 
    If the Replicator is unable to provide any Proposals, the 'proposals'
-   list MUST be empty, a human-readable error message MAY be retured in
+   list MUST be empty, a human-readable error message MAY be returned in
    the 'proposal-error' field, then the 'status' field MUST be set to
    'replicator-proposal-error'.
 
@@ -466,7 +466,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
 
    Part of each Proposal is a 'stream-format' branch, which provides
    back to the Client the packet format the Receiver will be receiving.
-   This format completely defines the entirity of the resulting data
+   This format completely defines the entirety of the resulting data
    flow format - there is no normative format.  A couple non-normative
    examples of what may result are provided in Section 4.
 
@@ -522,14 +522,14 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
       'install-error' to a human-readable error message and MUST set
       'status' to 'replicator-install-error'.
 
-3.5.  Endding sampling and cleanup
+3.5.  Ending sampling and cleanup
 
    When a Client is finished with a sampling session, it simply deletes
    its entry in the samplers list to terminate a sampling session.
    Otherwise, a Client MUST refresh its entry by setting 'client-
    heartbeat' to 0 at least every 3600 seconds.  If 'client-heartbeat'
    exceeds 3600, the Replicator SHOULD consider the sampling
-   configuration and any assocatied sampling session no longer
+   configuration and any associated sampling session no longer
    necessary, terminate the sampling, and delete the entry.
 
 4.  Data Stream Format
@@ -628,7 +628,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
    |           |       |                        | to interface-refs    |
    |           |       |                        | from [RFC8343].      |
    +-----------+-------+------------------------+----------------------+
-   | Timestamp | 24    | timestamp-nsec-ingress | Two 32 bit numbers   |
+   | Timestamp | 24    | timestamp-nsec-ingress | Two 32-bit numbers   |
    |           |       |                        | giving when the "0"  |
    |           |       |                        | of this field is     |
    |           |       |                        | based off of, using  |
@@ -684,7 +684,7 @@ Internet-Draft          Sampled Traffic Streaming          November 2019
      |           |       |                    | to interface-refs   |
      |           |       |                    | from [RFC8343].     |
      +-----------+-------+--------------------+---------------------+
-     | Timestamp | 64    | timestamp-msec     | Two 32 bit numbers  |
+     | Timestamp | 64    | timestamp-msec     | Two 32-bit numbers  |
      |           |       |                    | giving when the "0" |
      |           |       |                    | of this field is    |
      |           |       |                    | based off of, using |

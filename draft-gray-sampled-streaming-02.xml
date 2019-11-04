@@ -82,7 +82,7 @@
     <workgroup>Internet Engineering Task Force</workgroup>
     <keyword>template</keyword>
     <abstract>
-      <t>This document standardizes the following both 1) a means of requesting a stream of packet samples from any device generating, routing, or forwarding traffic, and 2) receiving metadata information from the network element about these packet samples, and the structure of said stream metadata.  This is designed to provide even network elements with widely varying capabilities (e.g. ASICs, NPUs, NICs, vSwitches, CPUs) a mechanism to sample and export packets at high rates, by allowing communication of the specific bit formats of headers applied to the packet flow, in a way that enhances interoperability between traffic sources and sinks.  Historically, Netflow and similar mechanisms have been used for these use cases; however the increasing packet rates of very high speed devices and increasing variance in the information available to data planes lends itself to both a less-prescriptive set of packet formats as well as a decoupling of the sampling action from the collection and analysis mechanisms.
+      <t>This document standardizes both 1) a means of requesting a stream of packet samples from any device generating, routing, or forwarding traffic, and 2) receiving metadata information from the network element about these packet samples, and the structure of said stream metadata.  A main design requirement is to provide network elements with widely varying capabilities (e.g. ASICs, NPUs, NICs, vSwitches, CPUs) a mechanism to sample and export packets at high rates, by allowing communication of the specific bit formats of headers applied to the packet flow, in a way that enhances interoperability between traffic sources and sinks.  Historically, Netflow and similar mechanisms have been used for these use cases; however, the increasing packet rates of very high speed devices and increasing variance in the information available to data planes lends itself to both a less-prescriptive set of packet formats as well as a decoupling of the sampling action from the collection and analysis mechanisms.
       </t>
     </abstract>
   </front>
@@ -91,11 +91,7 @@
   <middle>
     <section title="Introduction">
       <section title="Requirements Language">
-        <t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;,
-        &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
-        document are to be interpreted as described in 
-          <xref target="RFC2119">RFC 2119</xref>
-          .</t>
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119">RFC 2119</xref>.</t>
       </section>
       <section title="Terminology">
         <t>The following terms are used within this document:
@@ -103,7 +99,7 @@
             <t>Client: The device configuring the Replicator.</t>
             <t>Receiver: The device receiving the packet stream.</t>
             <t>Replicator: The device performing the actual packet replication, as requested by a Client, and sending the resulting replicated packet stream to a Receiver.</t>
-            <t>Point: The location inside the Replicator (e.g, a forwarding ASIC) that performs the actual packet replication.  There may be multiple physical interfaces serviced by one Point, or one interface may be serviced by multiple Points, that may have different capabilities.</t>
+            <t>Point: The location inside the Replicator (e.g., a forwarding ASIC) that performs the actual packet replication.  There may be multiple physical interfaces serviced by one Point, or one interface may be serviced by multiple Points, that may have different capabilities.</t>
           </list>
         </t>
       </section>
@@ -130,17 +126,17 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+  stream, appends metadata
             ^^
 +-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Dataplane Forwarding   |  Stream of data packets moving through 
-+-+-+-+-+-+-+-+-+-+-+-+-+-+  element dataplane
+|  Data Plane Forwarding  |  Stream of data packets moving through 
++-+-+-+-+-+-+-+-+-+-+-+-+-+  element data plane
 ]]>
         </artwork>
       </figure>
-      <t>The primary advantage of the stack model is the ability to disaggregate or abstract functions from each other.  For example, providing a self-describing, flexible format for the metadata abstracts the data plane -- in other words the upper layers do not need to know how many bits wide a metadata field is, they only need to know that it is present and the semantics.  Separating the transport function allows for multiple use cases: a router wishing to sample packets for internal consumption within the same system might use a locally defined (perhaps even proprietary) transport header, while putting the sampled metadata+packet into a UDP packet allows for it to be transported to any IP-reachable collector, regardless of the geographic or topological distance from the Replicator itself.</t>
+      <t>The primary advantage of the stack model is the ability to disaggregate or abstract functions from each other.  For example, providing a self-describing, flexible format for the metadata abstracts the data plane -- in other words the upper layers do not need to know how many bits wide a metadata field is, they only need to know that it is present and the semantics.  Separating the transport function allows for multiple use cases: a router wishing to sample packets for internal consumption within the same system might use a locally defined (perhaps even proprietary) transport header, while putting the sampled metadata and packet into a UDP packet allows for it to be transported to any IP-reachable collector, regardless of the geographic or topological distance from the Replicator itself.</t>
 	   <t>This document standardizes the "Sampling / Metadata" and "Export / Transport" components of the above stack.</t>
     </section>
 	</section>
 	<section title="Use Cases">
-	  <t>This document is designed around the following current and forseeable use cases that operators have today.</t>
+	  <t>This document is designed around the following current and foreseeable use cases that operators have today.</t>
       <section title="Use Case 1 : Traffic Analytics">
         <t>Operators typically use a mix of NetFlow, IPFIX, and inline traffic samplers spread throughout the network to gather data for analytics.  With the next generation of hardware, 400Gb/s interfaces are becoming available, with higher data rates under development in their respective standards bodies.  This will require at least an augmentation of any inline traffic samplers, which are quite expensive.  Additionally, the pace of growth in the data plane is outgrowing the pace of growth of the control plane.  This is especially visible with relatively control plane or CPU-heavy protocols such as NetFlow, where current sampling rates are simply not going to be sustainable long-term, primarily due to on-box control plane hardware limitations.  Being able to capture a filtered, sampled collection of actual packets throughout the network is very valuable for understanding how the network is being used, to provide hard data to justify network topology augments and/or technology changes.</t>
         <t>This proposal addresses this use case by: 1) making the data replication mechanism as simple as possible, reducing the need for high levels of complexity in the data plane; 2) decoupling the sampling/collection of packets from the analysis, which in turn allows for the analysis to be performed on distributed, horizontally-scalable platforms rather than being constrained to the compute and storage capabilities of a local network element.
@@ -152,10 +148,10 @@
       </section>
       <section title="Use Case 3 : Standardization">
         <t>Standardizing the way these data streams are formed and communicated between the Replicators, Clients, and Receivers in a fashion that allows vendors flexibility in what work the ASIC has to do to support sampled streaming (by allowing communicating of an extremely dynamic header in a manner than control planes can manage) allows systems to be used between all platforms in an interoperable fashion.  The alternative is to build independent systems for each packet replication solution that may end up being developed, resulting in much higher costs for an overall solution.</t>
-        <t>This proposal addresses this use case by allowing the sampled packet header to provide varying metadata fields, without mandating specific positions or widths.  These fields and their format is a function of the Replicator, and information about how to handle this data is exchanged between the Replicator, Client, and Receiver at the initialization of the session.  The motivation for such latitude in encoding and sizing is quite intentional, as it permits widely varying capabilities within the replicators.</t>
+        <t>This proposal addresses this use case by allowing the sampled packet header to provide varying metadata fields, without mandating specific positions or widths.  This arrangement of fields and their format is a function of the Replicator, and information about how to handle this data is exchanged between the Replicator, Client, and Receiver at the initialization of the session.  The motivation for such latitude in encoding and sizing is quite intentional, as it permits widely varying capabilities within the replicators.</t>
       </section>
       <section title="Use Case 4: Security Automation">
-        <t>An automated security platform can utilize this proposal to set up a &quot;normal security analysis&quot; stream at a very low sampling rate (for example, 1 in 20,000) for constant monitoring at various points throughout the network.  Upon seeing something it deems 'interesting', or by manual input, it can add in an additional, targeted, stream, at a very high sampling rate (potentionally 1:1) for detailed analysis and mitigation efforts.</t>
+        <t>An automated security platform can utilize this proposal to set up a "normal security analysis" stream at a very low sampling rate (for example, 1 in 20,000) for constant monitoring at various points throughout the network.  Upon seeing something it deems 'interesting', or by manual input, it can add in an additional, targeted, stream, at a very high sampling rate (potentially 1:1) for detailed analysis and mitigation efforts.</t>
         <t>Examples of past incidents where this may have been useful are the NTP MONLIST attacks, DNS attacks, or DDoS attacks (although 1:1 would most likely not be used in a DDoS case, unless performing the initial data collection).</t>
         <t>The security platform could potentially then use the collected packets to generate an auto-mitigation plan based on heuristics (i.e., 99% of this sudden burst of traffic has something in common, deploy mitigation targeting that.)</t>
       </section>
@@ -165,7 +161,7 @@
       <section title="Client queries Replicator for Points">
         <t>A Client MUST first request from the Replicator the available configurations via the 'points' branch, which provides the following information:
           <ul>
-            <li><t>'name' - The name of the Point.  This services as a key, and SHOULD NOT be interpreted as anything other than a uniquely identifying value.  A Replicator MAY choose to use an internal path, an encoded address, or any other value of its choosing.</t></li>
+            <li><t>'name' - The name of the Point.  This serves as a key, and SHOULD NOT be interpreted as anything other than a uniquely identifying value.  A Replicator MAY choose to use an internal path, an encoded address, or any other value of its choosing.</t></li>
             <li><t>'interfaces' - The physical interfaces this Point is servicing.  A Replicator MAY offer the same interfaces under different Points, with a different set of options.  A Replicator MAY not offer a Point for every interface available on the system.</t></li>
             <li><t>'filters' - What filters can be applied (for example, against certain IP fields, against parts of the frame, etc.).  A Replicator MAY not be able to honor every combination of filters submitted in a request, or MAY not offer any filtering capability at all.  A Replicator MAY only be able to support a limited number of filters, which MAY be returned in in the 'max-filters' branch.</t></li>
             <li><t>'min-ratio' and 'max-ratio' - Minimum and maximum sampling rates possible at this point.  These are provided as a number N, denoting one sample will be returned for every N.  A Replicator MAY not be able to offer a 'min-ratio' of 1 (i.e. every packet).</t></li>
@@ -188,9 +184,9 @@
       </section>
       <section title="Replicator offers Proposals">
         <t>Upon receiving the 'status' change to 'client-request-complete', the Replicator updates the 'proposals' branch.  This branch details zero, one, or more ways the Replicator can fulfill the sampling request.  While generally there will only be zero or one proposals, a Replicator MAY offer more, especially in cases where matching a sampling rate exactly would result in performance loss, or offers of what headers can be captured in the resulting stream.  Each proposal includes a unique ID number, allowing the Client to select one, as detailed below.</t>
-        <t>If the Replicator is unable to provide any Proposals, the 'proposals' list MUST be empty, a human-readable error message MAY be retured in the 'proposal-error' field, then the 'status' field MUST be set to 'replicator-proposal-error'.</t>
+        <t>If the Replicator is unable to provide any Proposals, the 'proposals' list MUST be empty, a human-readable error message MAY be returned in the 'proposal-error' field, then the 'status' field MUST be set to 'replicator-proposal-error'.</t>
         <t>If the Replicator was able to provide Proposals, it MUST set the 'status' field to 'replicator-proposals-available' when it is finished, and the 'proposals' branch MUST be read-only until the Client makes a selection.</t>
-        <t>Part of each Proposal is a 'stream-format' branch, which provides back to the Client the packet format the Receiver will be receiving.  This format completely defines the entirity of the resulting data flow format - there is no normative format.  A couple non-normative examples of what may result are provided in <xref target="ds_format" />.</t>
+        <t>Part of each Proposal is a 'stream-format' branch, which provides back to the Client the packet format the Receiver will be receiving.  This format completely defines the entirety of the resulting data flow format - there is no normative format.  A couple non-normative examples of what may result are provided in <xref target="ds_format" />.</t>
         <t>To adequately addresses the use cases stated above, a Replicator SHOULD support as a minimum set of capabilities:
         <ul>
           <li><t>An action field that denotes a pass or drop (ideally with drop reason)</t></li>
@@ -211,8 +207,8 @@
         <li><t>MUST either install the requested sampling stream if possible, then MUST set 'status' to 'replicator-install-success', or MAY set 'install-error' to a human-readable error message and MUST set 'status' to 'replicator-install-error'.</t></li>
         </ul></t>
       </section>
-      <section title="Endding sampling and cleanup">
-        <t>When a Client is finished with a sampling session, it simply deletes its entry in the samplers list to terminate a sampling session.  Otherwise, a Client MUST refresh its entry by setting 'client-heartbeat' to 0 at least every 3600 seconds.  If 'client-heartbeat' exceeds 3600, the Replicator SHOULD consider the sampling configuration and any assocatied sampling session no longer necessary, terminate the sampling, and delete the entry.</t>
+      <section title="Ending sampling and cleanup">
+        <t>When a Client is finished with a sampling session, it simply deletes its entry in the samplers list to terminate a sampling session.  Otherwise, a Client MUST refresh its entry by setting 'client-heartbeat' to 0 at least every 3600 seconds.  If 'client-heartbeat' exceeds 3600, the Replicator SHOULD consider the sampling configuration and any associated sampling session no longer necessary, terminate the sampling, and delete the entry.</t>
       </section>
     </section>
     <section title="Data Stream Format" anchor="ds_format">
@@ -244,7 +240,7 @@
         <ttcol>Field Type</ttcol>
         <ttcol>Field Type-Data</ttcol>
         <c>Incoming port</c><c>8</c><c>port-ingress</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"/>.</c>
-        <c>Timestamp</c><c>24</c><c>timestamp-nsec-ingress</c><c>Two 32 bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
+        <c>Timestamp</c><c>24</c><c>timestamp-nsec-ingress</c><c>Two 32-bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
         <c>Act</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
         <c>Frame Length</c><c>17</c><c>frame-length-ingress</c><c>Note that this denotes the original frame length - the payload field MAY not include the entire payload.</c>
         <c>Internal Data 1</c><c>13</c><c>padding</c><c/>
@@ -257,7 +253,7 @@
         <ttcol>Field Type</ttcol>
         <ttcol>Field Type-Data</ttcol>
         <c>Interface ID</c><c>32</c><c>port</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"/>.</c>
-        <c>Timestamp</c><c>64</c><c>timestamp-msec</c><c>Two 32 bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
+        <c>Timestamp</c><c>64</c><c>timestamp-msec</c><c>Two 32-bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
         <c>Captured Packet Length</c><c>32</c><c>frame-payload-size</c><c>Note: This allows us to have the Options field as our real variable length field.</c>
         <c>Original Packet Length</c><c>32</c><c>frame-length</c><c/>
         <c>Packet Data</c><c>0</c><c>frame-payload</c><c/>
