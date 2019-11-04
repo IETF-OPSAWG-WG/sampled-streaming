@@ -428,7 +428,9 @@ module ietf-sampled-streaming {
     description
       "Filter definition.  Multiple filters are ANDed.";
     leaf name {
-      type string;
+      type string {
+        length "1..255";
+      }
       description
         "A name for this filter.";
     }
@@ -525,7 +527,9 @@ module ietf-sampled-streaming {
         "The listing of the fields that will be encapsulated and sent
          to the receiver.";
       leaf name {
-        type string;
+        type string {
+          length "1..255";
+        }
         description
           "Human readable name of what this field contains.";
       }
@@ -635,7 +639,9 @@ module ietf-sampled-streaming {
        ports they provide for, and what filtering is available at
        those points.";
     leaf name {
-      type string;
+      type string {
+        length "1..255";
+      }
       description
         "The name of this capture point.";
     }
@@ -732,7 +738,7 @@ module ietf-sampled-streaming {
         description
           "The number of seconds since the Client has refreshed this
            request.  The Client MUST only be able to set this value
-           to 0, the Replicator MUST keep track of it, and MAY opt to
+           to 0, the Replicator MUST keep track of it, and SHOULD
            delete this entry when it reaches 3600.";
       }
       container destination {
@@ -847,7 +853,9 @@ module ietf-sampled-streaming {
         }
       }
       leaf proposal-error {
-        type string;
+        type string {
+          length "1..1023";
+        }
         description
           "The Replicator was unable to generate any Proposals.";
       }
@@ -860,7 +868,9 @@ module ietf-sampled-streaming {
            to use.";
       }
       leaf install-error {
-        type string;
+        type string {
+          length "1..1023";
+        }
         description
           "The Replicator was unable to install the requested
            Proposal for this reason.";
