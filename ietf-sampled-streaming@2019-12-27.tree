@@ -1,0 +1,219 @@
+module: ietf-sampled-streaming
+  +--rw points* [name]
+     +--rw name                       psamp:nameType
+     +--rw observationPoints* [name]
+     |  +--rw name                   psamp:nameType
+     |  +--ro observationPointId?    uint32
+     |  +--rw observationDomainId    uint32
+     |  +--rw ifName*                ifNameType
+     |  +--rw ifIndex*               uint32
+     |  +--rw entPhysicalName*       string
+     |  +--rw entPhysicalIndex*      uint32
+     |  +--rw direction?             direction
+     +--rw selectors* [name]
+     |  +--rw name                         psamp:nameType
+     |  +--rw (Method)
+     |  |  +--:(selectAll)
+     |  |  |  +--rw selectAll?             empty
+     |  |  +--:(sampCountBased)
+     |  |  |  +--rw sampCountBased {psampSampCountBased}?
+     |  |  |     +--rw packetInterval    uint32
+     |  |  |     +--rw packetSpace       uint32
+     |  |  +--:(sampTimeBased)
+     |  |  |  +--rw sampTimeBased {psampSampTimeBased}?
+     |  |  |     +--rw timeInterval    uint32
+     |  |  |     +--rw timeSpace       uint32
+     |  |  +--:(sampRandOutOfN)
+     |  |  |  +--rw sampRandOutOfN {psampSampRandOutOfN}?
+     |  |  |     +--rw size          uint32
+     |  |  |     +--rw population    uint32
+     |  |  +--:(sampUniProb)
+     |  |  |  +--rw sampUniProb {psampSampUniProb}?
+     |  |  |     +--rw probability    decimal64
+     |  |  +--:(filterMatch)
+     |  |  |  +--rw filterMatch {psampFilterMatch}?
+     |  |  |     +--rw (nameOrId)
+     |  |  |     |  +--:(ieName)
+     |  |  |     |  |  +--rw ieName?         ieNameType
+     |  |  |     |  +--:(ieId)
+     |  |  |     |     +--rw ieId?           ieIdType
+     |  |  |     +--rw ieEnterpriseNumber?   uint32
+     |  |  |     +--rw value                 string
+     |  |  +--:(filterHash)
+     |  |     +--rw filterHash {psampFilterHash}?
+     |  |        +--rw hashFunction?       identityref
+     |  |        +--rw initializerValue?   uint64
+     |  |        +--rw ipPayloadOffset?    uint64
+     |  |        +--rw ipPayloadSize?      uint64
+     |  |        +--rw digestOutput?       boolean
+     |  |        +--ro outputRangeMin?     uint64
+     |  |        +--ro outputRangeMax?     uint64
+     |  |        +--rw selectedRange* [name]
+     |  |           +--rw name    nameType
+     |  |           +--rw min?    uint64
+     |  |           +--rw max?    uint64
+     |  +--ro packetsObserved?             yang:counter64
+     |  +--ro packetsDropped?              yang:counter64
+     |  +--ro selectorDiscontinuityTime?   yang:date-and-time
+     +--ro filters* []
+     |  +--ro filter    filter-type
+     +--ro max-samplers?              uint32
+     +--ro max-filters?               uint32
+     +--ro max-frame-length-copy?     uint16
+     +--ro max-frame-depth-inspect?   uint16
+     +--rw samplers* [name]
+        +--rw name                 string
+        +--rw status               status-type
+        +--rw client-heartbeat     uint32
+        +--rw destination
+        |  +--rw type              destination-type
+        |  +--rw udp-parameters
+        |     +--rw destination-ip      inet:ip-address-no-zone
+        |     +--rw destination-port    inet:port-number
+        +--rw request
+        |  +--rw filters
+        |  |  +--rw name?            string
+        |  |  +--rw interfaces* [int]
+        |  |  |  +--rw int    if:interface-ref
+        |  |  +--rw actions* [action]
+        |  |  |  +--rw action    action-type
+        |  |  +--rw direction?       psamp:direction
+        |  |  +--rw type             filter-type
+        |  |  +--rw ipv4-address?    inet:ipv4-address-no-zone
+        |  |  +--rw ipv6-address?    inet:ipv6-address-no-zone
+        |  |  +--rw version?         inet:ip-version
+        |  |  +--rw frame-payload
+        |  |  |  +--rw offset?   uint16
+        |  |  |  +--rw match?    binary
+        |  |  +--rw frame-length?    uint16
+        |  +--rw selector
+        |  |  +--rw (Method)
+        |  |  |  +--:(selectAll)
+        |  |  |  |  +--rw selectAll?             empty
+        |  |  |  +--:(sampCountBased)
+        |  |  |  |  +--rw sampCountBased {psampSampCountBased}?
+        |  |  |  |     +--rw packetInterval    uint32
+        |  |  |  |     +--rw packetSpace       uint32
+        |  |  |  +--:(sampTimeBased)
+        |  |  |  |  +--rw sampTimeBased {psampSampTimeBased}?
+        |  |  |  |     +--rw timeInterval    uint32
+        |  |  |  |     +--rw timeSpace       uint32
+        |  |  |  +--:(sampRandOutOfN)
+        |  |  |  |  +--rw sampRandOutOfN {psampSampRandOutOfN}?
+        |  |  |  |     +--rw size          uint32
+        |  |  |  |     +--rw population    uint32
+        |  |  |  +--:(sampUniProb)
+        |  |  |  |  +--rw sampUniProb {psampSampUniProb}?
+        |  |  |  |     +--rw probability    decimal64
+        |  |  |  +--:(filterMatch)
+        |  |  |  |  +--rw filterMatch {psampFilterMatch}?
+        |  |  |  |     +--rw (nameOrId)
+        |  |  |  |     |  +--:(ieName)
+        |  |  |  |     |  |  +--rw ieName?         ieNameType
+        |  |  |  |     |  +--:(ieId)
+        |  |  |  |     |     +--rw ieId?           ieIdType
+        |  |  |  |     +--rw ieEnterpriseNumber?   uint32
+        |  |  |  |     +--rw value                 string
+        |  |  |  +--:(filterHash)
+        |  |  |     +--rw filterHash {psampFilterHash}?
+        |  |  |        +--rw hashFunction?       identityref
+        |  |  |        +--rw initializerValue?   uint64
+        |  |  |        +--rw ipPayloadOffset?    uint64
+        |  |  |        +--rw ipPayloadSize?      uint64
+        |  |  |        +--rw digestOutput?       boolean
+        |  |  |        +--ro outputRangeMin?     uint64
+        |  |  |        +--ro outputRangeMax?     uint64
+        |  |  |        +--rw selectedRange* [name]
+        |  |  |           +--rw name    nameType
+        |  |  |           +--rw min?    uint64
+        |  |  |           +--rw max?    uint64
+        |  |  +--ro packetsObserved?             yang:counter64
+        |  |  +--ro packetsDropped?              yang:counter64
+        |  |  +--ro selectorDiscontinuityTime?   yang:date-and-time
+        |  +--rw ratio        uint32
+        |  +--rw min-ratio?   uint32
+        |  +--rw max-ratio?   uint32
+        +--ro proposals* [id]
+        |  +--ro id                            uint32
+        |  +--ro selector
+        |  |  +--ro (Method)
+        |  |  |  +--:(selectAll)
+        |  |  |  |  +--ro selectAll?             empty
+        |  |  |  +--:(sampCountBased)
+        |  |  |  |  +--ro sampCountBased {psampSampCountBased}?
+        |  |  |  |     +--ro packetInterval    uint32
+        |  |  |  |     +--ro packetSpace       uint32
+        |  |  |  +--:(sampTimeBased)
+        |  |  |  |  +--ro sampTimeBased {psampSampTimeBased}?
+        |  |  |  |     +--ro timeInterval    uint32
+        |  |  |  |     +--ro timeSpace       uint32
+        |  |  |  +--:(sampRandOutOfN)
+        |  |  |  |  +--ro sampRandOutOfN {psampSampRandOutOfN}?
+        |  |  |  |     +--ro size          uint32
+        |  |  |  |     +--ro population    uint32
+        |  |  |  +--:(sampUniProb)
+        |  |  |  |  +--ro sampUniProb {psampSampUniProb}?
+        |  |  |  |     +--ro probability    decimal64
+        |  |  |  +--:(filterMatch)
+        |  |  |  |  +--ro filterMatch {psampFilterMatch}?
+        |  |  |  |     +--ro (nameOrId)
+        |  |  |  |     |  +--:(ieName)
+        |  |  |  |     |  |  +--ro ieName?         ieNameType
+        |  |  |  |     |  +--:(ieId)
+        |  |  |  |     |     +--ro ieId?           ieIdType
+        |  |  |  |     +--ro ieEnterpriseNumber?   uint32
+        |  |  |  |     +--ro value                 string
+        |  |  |  +--:(filterHash)
+        |  |  |     +--ro filterHash {psampFilterHash}?
+        |  |  |        +--ro hashFunction?       identityref
+        |  |  |        +--ro initializerValue?   uint64
+        |  |  |        +--ro ipPayloadOffset?    uint64
+        |  |  |        +--ro ipPayloadSize?      uint64
+        |  |  |        +--ro digestOutput?       boolean
+        |  |  |        +--ro outputRangeMin?     uint64
+        |  |  |        +--ro outputRangeMax?     uint64
+        |  |  |        +--ro selectedRange* [name]
+        |  |  |           +--ro name    nameType
+        |  |  |           +--ro min?    uint64
+        |  |  |           +--ro max?    uint64
+        |  |  +--ro packetsObserved?             yang:counter64
+        |  |  +--ro packetsDropped?              yang:counter64
+        |  |  +--ro selectorDiscontinuityTime?   yang:date-and-time
+        |  +--ro performance-penalty?          boolean
+        |  +--ro performance-penalty-amount?   uint16
+        |  +--ro stream-format
+        |  |  +--ro fields* [name]
+        |  |     +--ro name                  string
+        |  |     +--ro size?                 uint32
+        |  |     +--ro type?                 field-type
+        |  |     +--ro action-mappings* [value]
+        |  |     |  +--ro value      binary
+        |  |     |  +--ro meaning?   action-type
+        |  |     +--ro port-mappings* [value]
+        |  |     |  +--ro value    binary
+        |  |     |  +--ro port?    if:interface-ref
+        |  |     +--ro direction-mappings* [value]
+        |  |     |  +--ro value        binary
+        |  |     |  +--ro direction?   psamp:direction
+        |  |     +--ro timestamp
+        |  |     |  +--ro seconds?       uint32
+        |  |     |  +--ro nanoseconds?   uint32
+        |  |     +--ro payload-contents?     frame-headers
+        |  +--ro filters* [name]
+        |     +--ro name             string
+        |     +--ro interfaces* [int]
+        |     |  +--ro int    if:interface-ref
+        |     +--ro actions* [action]
+        |     |  +--ro action    action-type
+        |     +--ro direction?       psamp:direction
+        |     +--ro type             filter-type
+        |     +--ro ipv4-address?    inet:ipv4-address-no-zone
+        |     +--ro ipv6-address?    inet:ipv6-address-no-zone
+        |     +--ro version?         inet:ip-version
+        |     +--ro frame-payload
+        |     |  +--ro offset?   uint16
+        |     |  +--ro match?    binary
+        |     +--ro frame-length?    uint16
+        +--rw proposal-error?      string
+        +--rw proposal-selected?   uint32
+        +--rw install-error?       string

@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+
+<!DOCTYPE rfc SYSTEM 'rfc2629.dtd' [
+<!ENTITY RFC2119 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC2784 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2784.xml">
+<!ENTITY RFC3688 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3688.xml">
+<!ENTITY RFC5476 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5476.xml">
+<!ENTITY RFC6020 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6020.xml">
+<!ENTITY RFC6728 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6728.xml">
+<!ENTITY RFC8343 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8343.xml">
+<!ENTITY PCAPNG SYSTEM "http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.tuexen-opsawg-pcapng.xml">
+]>
+
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs), 
+     please see http://xml2rfc.tools.ietf.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="3"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space 
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- keep one blank line between list items -->
+<!-- end of list of popular I-D processing instructions -->
+<rfc category="info" docName="draft-gray-sampled-streaming-03" ipr="trust200902" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN" 
+     they will automatically be output with "(if approved)" -->
+  <!-- ***** FRONT MATTER ***** -->
+  <front>
+    <title>Sampled Traffic Streaming</title>
+    <author fullname="Andrew Gray" initials="A." surname="Gray">
+      <organization>Charter Communications</organization>
+      <address>
+        <postal>
+          <street>8560 Upland Drive, Suite B</street>
+          <city>Englewood</city>
+          <region>CO</region>
+          <code>80112</code>
+          <country>US</country>
+        </postal>
+        <phone>+1 720 699 5125</phone>
+        <email>Andrew.Gray@charter.com</email>
+      </address>
+    </author>
+    <author fullname="Lawrence J Wobker" initials="L.J." surname="Wobker">
+      <organization>Cisco Systems</organization>
+      <address>
+        <postal>
+          <street>170 W Tasman Drive</street>
+          <city>San Jose</city>
+          <region>CA</region>
+          <code>95134</code>
+          <country>US</country>
+        </postal>
+        <phone>+1 984 216 1860</phone>
+        <email>lwobker@cisco.com</email>
+      </address>
+    </author>
+    <date year="2019"/>
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
+         in the current day for you. If only the current year is specified, xml2rfc will fill 
+   in the current day and month for you. If the year is not the current one, it is 
+   necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
+   purpose of calculating the expiry date).  With drafts it is normally sufficient to 
+   specify just the year. -->
+    <!-- Meta-data Declarations -->
+    <area>ops</area>
+    <workgroup>OPSAWG</workgroup>
+    <keyword>template</keyword>
+    <abstract>
+      <t>This document standardizes both 1) a means of requesting a stream of packet samples from any device generating, routing, or forwarding traffic, and 2) receiving metadata information from the network element about these packet samples, and the structure of said stream metadata.  A main design requirement is to provide network elements with widely varying capabilities (e.g., ASICs, NPUs, NICs, vSwitches, CPUs) a mechanism to sample and export packets at high rates, by allowing communication of the specific bit formats of internal data headers applied to the packet flow, in a way that enhances interoperability between traffic sources and sinks.  Historically, Netflow and similar mechanisms have been used for these use cases; however, the increasing packet rates of very high-speed devices and increasing variance in the information available to data planes lends itself to both a less-prescriptive set of packet formats as well as a decoupling of the sampling action from the collection and analysis mechanisms.
+      </t>
+    </abstract>
+  </front>
+
+
+  <middle>
+    <section title="Introduction">
+      <section title="Requirements Language">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119">RFC 2119</xref>.</t>
+      </section>
+      <section title="Terminology">
+        <t>The following terms are used within this document:
+          <list>
+            <t>Client: The device configuring the Replicator.</t>
+            <t>Receiver: The device receiving the packet stream.</t>
+            <t>Replicator: The device performing the actual packet replication, as requested by a Client, and sending the resulting replicated packet stream to a Receiver.</t>
+            <t>Point: The location inside the Replicator (e.g., a forwarding ASIC) that performs the actual packet replication.  There may be multiple physical interfaces serviced by one Point, or one interface may be serviced by multiple Points, that may have different capabilities.</t>
+          </list>
+        </t>
+      </section>
+	  <section title="Motivation for Disaggregation of Telemetry">
+	    <t>A key concept for this proposal is to enable very high rate sample generation for network elements, while at the same time separating the sampling mechanism itself from specific analysis or transport protocols.  If we separate the component functions of how these problems have been traditionally solved, these functions lend themselves to being viewed as a layered stack such as the one in the figure:</t>
+	  	<figure align="center" anchor="telemetry_stack">
+	  	  <preamble>Figure: Packet sampling and analysis viewed as a layered stack</preamble>
+		    <artwork>
+          <![CDATA[
++-+-+-+-+-+-+-+-+-+-+-+-+-+
+|        Analysis         |   Higher level applications perform  
++-+-+-+-+-+-+-+-+-+-+-+-+-+   further analysis on aggregated samples
+            ^^
++-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Collection / Decoding  |   Samples arrives at Receiver, decoded, 
++-+-+-+-+-+-+-+-+-+-+-+-+-+   optionally stored/aggregated
+            ^^
++-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Export  / Transport   |  Encapsulate packet sample and metadata, 
++-+-+-+-+-+-+-+-+-+-+-+-+-+  send via configured transport protocol
+            ^^
++-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Sampling / Metadata    |  Samples filters packets at a fixed  
++-+-+-+-+-+-+-+-+-+-+-+-+-+  ratio from stream, appends metadata
+            ^^
++-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Data Plane Forwarding  |  Stream of data packets moving through 
++-+-+-+-+-+-+-+-+-+-+-+-+-+  element data plane
+]]>
+        </artwork>
+      </figure>
+      <t>The primary advantage of the stack model is the ability to disaggregate functions from each other.  For example, providing a self-describing, flexible format for the metadata abstracts the data plane -- in other words the upper layers do not need to know how many bits wide a metadata field is, they only need to know that it is present and the semantics.  Separating the transport function allows for multiple use cases: a router wishing to sample packets for internal consumption within the same system might use a locally defined (perhaps even proprietary) transport header, while putting the sampled metadata and packet into a UDP packet allows for it to be transported to any IP-reachable collector, regardless of the geographic or topological distance from the Replicator itself.</t>
+	   <t>This document standardizes the "Sampling / Metadata" and "Export / Transport" components of the above stack.</t>
+    </section>
+    <section title="Comparisons with PSAMP">
+      <t>Packet Sampling (PSAMP) from <xref target="RFC5476">RFC 5476</xref> shares some of the characteristics of Sampled Streaming, and parts of its YANG model as documented in <xref target="RFC6728">RFC 6728</xref> are in fact imported into this one to share concepts where possible.  However, Sampled Streaming differs primarily in the ability to have the Replicator specify the outgoing packet format in a very dynamic fashion that suits itself as best as possible.  This is done to allow this replication to be done natively on forwarding hardware and to ensure the only usage of high-capability CPU resources on the Replicator is in the initial setup and negotiation.  All other aspects have been made to allow the Replicator to do the least amount of work as possible, to extract as much information as possible, and get it sent to the Receiver who is presumed to have orders of magnitudes greater compute capability available.  Other changes to the setup and configuration are wrapped around this primary goal.</t>
+    </section>
+	</section>
+	<section title="Use Cases">
+	  <t>This document is designed around the following current and foreseeable use cases that operators have today.</t>
+      <section title="Use Case 1: Traffic Analytics">
+        <t>Operators typically use a mix of NetFlow, IPFIX, and in-line traffic samplers spread throughout the network to gather data for analytics.  With the next generation of hardware, 400Gb/s interfaces are becoming available, with higher data rates under development in their respective standards bodies.  This will require at least an augmentation of any in-line traffic samplers, which are quite expensive.  Additionally, the pace of growth in the data plane is outgrowing the pace of growth of the control plane.  This is especially visible with relatively control plane or CPU-heavy protocols such as NetFlow, where current sampling rates are simply not going to be sustainable long-term, primarily due to on-box control plane hardware limitations.  Being able to capture a filtered, sampled collection of actual packets throughout the network is very valuable for understanding how the network is being used, to provide hard data to justify network topology augments and/or technology changes.</t>
+        <t>This proposal addresses this use case by: 1) making the data replication mechanism as simple as possible, reducing the need for high levels of complexity in the data plane; 2) decoupling the sampling/collection of packets from the analysis, which in turn allows for the analysis to be performed on distributed, horizontally-scalable platforms rather than being constrained to the compute and storage capabilities of a local network element.
+        </t>
+      </section>
+      <section title="Use Case 2: Network Behavior Verification">
+        <t>This use case focuses on the potential ability to have the ASICs stream discarded packets, along with an indication as to the reason for the drop.  With fields denoting the reason for dropped packets such as QoS policies, buffer contention, ACLs, etc., such discarded traffic could be streamed (potentially at a sampling rate of 1:1, i.e. every packet) off-box for analysis to determine if the observed behavior was expected, or trigger alerts that QoS policies may be having adverse effects on the network.  The ability to include the packet payload provides additional context, allowing examination of the platform behavior and affected policies.</t>
+        <t>This proposal addresses this use case by allowing samplers which have such capabilities to communicate to the receiver: 1) drop codes(reasons) that are known, 2) the semantics of those codes, and 3) the specific bit formats for the receiver to use when decoding.</t>
+      </section>
+      <section title="Use Case 3: Standardization">
+        <t>Standardizing the way these data streams are formed and communicated between the Replicators, Clients, and Receivers in a fashion that allows vendors flexibility in what work the ASIC has to do to support sampled streaming (by allowing communicating of an extremely dynamic header in a manner than control planes can manage) allows systems to be used between all platforms in an interoperable fashion.  The alternative is to build independent systems for each packet replication solution that may end up being developed, resulting in much higher costs for an overall solution.</t>
+        <t>This proposal addresses this use case by allowing the sampled packet header to provide varying metadata fields, without mandating specific positions or widths.  This arrangement of fields and their format is a function of the Replicator, and information about how to handle this data is exchanged between the Replicator, Client, and Receiver at the initialization of the session.  The motivation for such latitude in encoding and sizing is quite intentional, as it permits widely varying capabilities within the Replicators.</t>
+      </section>
+      <section title="Use Case 4: Security Automation">
+        <t>An automated security platform can utilize this proposal to set up a "normal security analysis" stream at a very low sampling rate (for example, 1 in 20,000) for constant monitoring at various points throughout the network.  Upon seeing something it deems 'interesting', or by manual input, it can add in an additional, targeted, stream, at a very high sampling rate (potentially 1:1) for detailed analysis and mitigation efforts.</t>
+        <t>Examples of past incidents where this may have been useful are the NTP MONLIST attacks, DNS attacks, or DDoS attacks (although 1:1 would most likely not be used in a DDoS case, unless performing the initial data collection).</t>
+        <t>The security platform could potentially then use the collected packets to generate an auto-mitigation plan based on heuristics (i.e., 99% of this sudden burst of traffic has something in common, deploy mitigation targeting that.)</t>
+      </section>
+    </section>
+    <section title="Stream Setup">
+      <t>The configuration and setup between the Client and the Replicator utilizes the YANG model as listed in <xref target="yang_model" /> and any supported configuration method (NETCONF, RESTCONF, gRPC, etc.).  The tree output of this model, as provided in <xref target="yang_tree" /> is provided as an aid to understanding the interactions and tree structure as described in this document.</t>
+      <section title="Client queries Replicator for Points">
+        <t>A Client MUST first request from the Replicator the available configurations via the 'points' branch, which provides the following information:
+          <ul>
+            <li><t>'name' - The name of the Point.  This serves as a key, and SHOULD NOT be interpreted by software as anything other than a possibly-human-readable uniquely identifying value.  A Replicator MAY choose to use an internal path, an encoded address, or any other value of its choosing.</t></li>
+            <li><t>'interfaces' - The physical interfaces this Point is servicing.  A Replicator MAY offer the same interfaces under different Points, with a different set of options.  A Replicator MAY not offer a Point for every interface available on the system.</t></li>
+            <li><t>'filters' - What filters can be applied (for example, against certain IP fields, against parts of the frame, etc.).  A Replicator MAY not be able to honor every combination of filters submitted in a request, or MAY not offer any filtering capability at all.  A Replicator MAY only be able to support a limited number of filters, which MAY be returned in in the 'max-filters' branch.</t></li>
+            <li><t>'min-ratio' and 'max-ratio' - Minimum and maximum sampling rates possible at this point.  These are provided as a number N, denoting one sample will be returned for every N.  A Replicator MAY not be able to offer a 'min-ratio' of 1 (i.e. every packet).</t></li>
+            <li><t>'samplers' - A list of any current samplers already active on this Point as requested by this Client, and the branch manipulated in the next section.  A Replicator SHOULD NOT inform a Client about the sampling sessions from other Clients.</t></li> 
+            <li><t>Optionally, the maximum frame length the Point can replicate into the sample in 'max-frame-length-copy'.</t></li>
+            <li><t>Optionally, the maximum offset into a frame the Point can inspect in 'max-frame-depth-inspect'.</t></li>
+            <li><t>Optionally, the maximum number of samplers that this Point can accommodate in 'max-samplers'.  A Client MUST still check for success, as highly complex filters may reduce the amount of replication the Point can do from this stated maximum.</t></li>
+          </ul>
+        </t>
+      </section>
+      <section title="Client submits a request to the Replicator">
+        <t>The Client then can request one or more streams to be set up on the Replicator, taking into consideration the provided information.  This is performed by sending a request via adding an entry to the 'samplers' list in the 'points' branch and filling in the parameters listed below:<ul>
+          <li><t>'name' MUST be unique in the list, and MAY be any valid string value up to 255 characters.  The Replicator MUST isolate namespaces between Clients (as one Client SHOULD NOT be able to see other Clients' entries).</t></li>
+          <li><t>'destination' sets the transport mechanism and Receiver address.  It should be noted that the Client and Receiver MAY be separate devices.  The mechanism of exchanging information between the Client and Receiver about this setup process is outside the scope of this document.  At present, the only supported transport mechanism is a UDP tunnel, as detailed below in <xref target="ds_format" />.</t></li>
+          <li><t>'client-heartbeat' MUST be set to 0.</t></li>
+          <li><t>The desired sampling rate ('ratio'), along with what degree of variance the Client can accept ('min-ratio' and 'max-ratio').  For example, the client may request a 1 in 2000 rate, but specify a range in the variance of 1900-2100.  A proposal may come back with the sampling rate offered of 1 in 2048, due to restrictions on the Replicator.</t></li>
+          <li><t>Optionally, one, or more filters in the 'filters' container, as seen in the 'filter-type' typedef in the Yang model.  Generally, a Client would filter at least on a specific interface and direction, but many other filter options are possible.</t></li>
+        </ul></t>
+        <t>When the client is done with its configuration, it MUST set 'status' to the 'client-request-complete' value, and the 'request' branch MUST be read-only from this point forward.</t>
+        <section title="Filtering Details">
+          <t>The filtering discussed above is designed to be as flexible as the Replicator can realistically support.  There are a few cases worth discussing in detail, which are covered here.</t>
+          <section title="Interfaces">
+            <t>All of the use cases focus on filtering to specific interface(s) to filter on.  A Replicator MAY, at its discretion, offer some or all of its possible physical interfaces, offer logical interfaces (i.e. routed interfaces on a port or VLAN, or subscriber interfaces), or LAG interfaces.  LAGs may be especially tricky, as the member ports of the LAG may span line cards of different capturing capabilities.  Replicators SHOULD make an attempt to offer LAGs if all ports are of identical capability, and MAY offer them in the case where they are not, with a lowest-common capability set.  Clients SHOULD NOT expect LAG functionality to be present, and SHOULD be prepared to set up separate sessions on each of the individual member ports if the Replicator does not offer the LAG, or offers it with an insufficient set.</t>
+          </section>
+        </section>
+      </section>
+      <section title="Replicator offers Proposals">
+        <t>Upon receiving the 'status' change to 'client-request-complete', the Replicator updates the 'proposals' branch.  This branch details zero, one, or more ways the Replicator can fulfill the sampling request.  While generally there will only be zero or one proposals, a Replicator MAY offer more.  For example, matching a sampling rate exactly would result in performance loss but a 'close enough' option can be offered that does not, or offers of what headers can be captured in the resulting stream.  Each proposal includes a unique ID number, allowing the Client to select one, as detailed below.</t>
+        <t>If the Replicator is unable to provide any Proposals, the 'proposals' list MUST be empty, a human-readable error message MAY be returned in the 'proposal-error' field, then the 'status' field MUST be set to 'replicator-proposal-error'.</t>
+        <t>If the Replicator was able to provide Proposals, it MUST set the 'status' field to 'replicator-proposals-available' when it is finished, and the 'proposals' branch MUST be read-only until the Client finishes the Proposal selection step below.</t>
+        <t>Part of each Proposal is a 'stream-format' branch, which informs the Client of the packet format the Receiver will be receiving.  This format completely defines the entirety of the resulting data flow format besides the outer UDP wrapper - there is no normative format.  A couple non-normative examples of what may result are provided in <xref target="ds_format" />.</t>
+        <t>To adequately addresses the use cases stated above, a Replicator SHOULD support as a minimum set of capabilities:
+        <ul>
+          <li><t>An action field that denotes a pass or drop (ideally with drop reason)</t></li>
+          <li><t>Capturing at least 128 octets of payload</t></li>
+          <li><t>The original frame length</t></li>
+          <li><t>Sampling rates up to 1:1 (i.e. every packet is replicated), and down to 1:20000 or smaller.</t></li>
+          <li><t>Having different sampling sessions having different sampling rates (to allow a "general" session to be watching a broad selection of traffic, and more specific sessions targeting exact flows or situations)</t></li>
+          <li><t>At least two sessions per physical interface</t></li>
+          <li><t>Filtering on ingress port</t></li>
+          <li><t>Filtering on action</t></li>
+          <li><t>Filtering on direction of traffic</t></li>
+        </ul>
+      </t>
+      </section>
+      <section title="Client selects a Proposal">
+        <t>Upon either a notification or detection that the 'status' field has been updated, the Client then may then set the 'proposal-selected' entry to the value of the desired ID offered in 'proposals', and then set 'status' to 'client-proposal selected'.  At this point, the Replicator:<ul>
+        <li><t>MAY remove unnecessary branches in the 'proposals' list, but MUST retain the selected one.</t></li>
+        <li><t>MUST either install the requested sampling stream if possible, then MUST set 'status' to 'replicator-install-success'.  If it cannot, it MAY set 'install-error' to a human-readable error message and MUST set 'status' to 'replicator-install-error'.</t></li>
+        <li><t>If the Proposal selected includes any of the 'dropped-' action-types as a filter, or does not specify an action-type filter at all, a Replicator MUST install the requested sampling before any filtering actions occur to the stream, as the sampling session is explicitly interested in pre-drop traffic.</t></li>
+        <li><t>If the Proposal selected does not include any of the 'dropped-' action-types as a filter, a Replicator MUST install the requested sampling after any filtering actions occur to the stream, to ensure the sampling ratio remains correct.</t></li>
+        </ul></t>
+      </section>
+      <section title="Ending sampling and cleanup">
+        <t>When a Client is finished with a sampling session, it deletes its entry in the 'samplers' tree to terminate a sampling session.  Otherwise, a Client MUST refresh its entry by setting 'client-heartbeat' to 0 at least every 3600 seconds.  The 'client-heartbeat' is then incremented by the Replicator.  If 'client-heartbeat' exceeds 3600, the Replicator SHOULD consider the sampling configuration and any associated sampling session no longer necessary, terminate the sampling, and delete the entry.  A Replicator MAY allow configuration to increase this timeout.</t>
+      </section>
+    </section>
+    <section title="Data Stream Format" anchor="ds_format">
+      <t>After the stream setup has been completed, the Receiver MUST use the stream-format data that the Replicator has calculated in its proposal.  The Client and Receiver MUST NOT assume that the stream-format data is consistent between one stream setup and any other (there may be different versions of ASICs, different capabilities, different versions of operating systems, or different filters may yield a different format), or that the payload is always at the end (it could appear at the beginning or in the middle, and sufficient data is provided by the other fields to extract the data correctly).  The stream-format data provides the Client with what information is provided at what location in the resulting packet.  The Replicator MUST follow the expectation that is provided in these fields.</t>
+      <t>There is one captured packet per encapsulated packet, and thus the outer encapsulation length can be used to deduce the length of one variable-length field (designated by a field length of 0) contained within.  If there is more than one variable-length field, a matching "-size"; field type MUST be provided for all but one of the variable-length fields (as a single variable length can be deduced from the wrapper length).</t>
+      <t>This means there is no normative packet format or data layout - a large point of this specification is to allow that packet format to be negotiated and decided between the Client and Replicator, with the information passed back via the stream-format data.</t>
+      <t>One example of what the resulting packet may look like (but not a normative listing of what it is - the actual format can be any combination of fields, of any size, in any order), the data inside the resulting data stream after the UDP tunnel header may look like the following:</t>
+      <figure align="center" anchor="expl_payload">
+        <preamble>Example 1: Packet layout</preamble>
+        <artwork>
+          <![CDATA[
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| Incoming Port | Timestamp                                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Act|          Frame Length           |       Internal Data 1   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           Payload                             |
+|                             ...                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+]]>
+        </artwork>
+      </figure>
+      <t>This non-normative example may be associated with a stream-format as per the following table:</t>
+      <texttable title="Example 1: Stream-format data">
+        <ttcol>Field Name</ttcol>
+        <ttcol>Field Size</ttcol>
+        <ttcol>Field Type</ttcol>
+        <ttcol>Field Type-Data</ttcol>
+        <c>Incoming port</c><c>8</c><c>port-ingress</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"/>.</c>
+        <c>Timestamp</c><c>24</c><c>timestamp-nsec-ingress</c><c>Two 32-bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
+        <c>Act</c><c>2</c><c>action</c><c>A listing of values that may be seen in this field, mapped to action types (accepted, dropped, etc.)</c>
+        <c>Frame Length</c><c>17</c><c>frame-length-ingress</c><c>Note that this denotes the original frame length - the payload field MAY not include the entire payload.</c>
+        <c>Internal Data 1</c><c>13</c><c>padding</c><c>Note that this may be ASIC-internal-only data, or some other information that would be expensive to prune out.  'padding' fields MUST have all content ignored.</c>
+        <c>Payload</c><c>0</c><c>frame-payload-ingress</c><c/>
+      </texttable>
+      <t>Another non-normative example, which is similar to the <xref target="I-D.tuexen-opsawg-pcapng"/> enhanced packet block (EPB) format (and thus, this Replicator may in fact be a server offering a tcpdump-based backend using this frontend):</t>
+      <texttable title="Packet-format response example 2">
+        <ttcol>Field Name</ttcol>
+        <ttcol>Field Size</ttcol>
+        <ttcol>Field Type</ttcol>
+        <ttcol>Field Type-Data</ttcol>
+        <c>Interface ID</c><c>32</c><c>port</c><c>A listing of values that may be seen in this field, mapped to interface-refs from <xref target="RFC8343"/>.</c>
+        <c>Timestamp</c><c>64</c><c>timestamp-msec</c><c>Two 32-bit numbers giving when the "0" of this field is based off of, using the PTP Truncated Timestamp format.</c>
+        <c>Captured Packet Length</c><c>32</c><c>frame-payload-size</c><c>Note: This allows us to have the Options field as our real variable length field.</c>
+        <c>Original Packet Length</c><c>32</c><c>frame-length</c><c/>
+        <c>Packet Data</c><c>0</c><c>frame-payload</c><c/>
+        <c>Options</c><c>0</c><c>padding</c><c/>
+      </texttable>
+      <t>To restate the prior note, the above is purely an example of what the format could be - the actual format used is negotiated between the Client and Replicator, and can have practically any layout, with any additional fields.</t>
+
+      <t>A Client SHOULD take efforts to be notified when a change has occurred on the Replicator (e.g., port or line card changes, device reboot, etc.), and re-verify and re-apply as needed its sampled streaming configurations when such a change is detected.</t>
+    </section>
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document defines a new UDP port number, entitled "Sampled Streaming", and assigns a value of TBD1 from the Service Name and Transport Protocol Port Number Registry https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml:</t>
+      <texttable>
+        <ttcol>Tag</ttcol>
+        <ttcol>Description</ttcol>
+        <c>TBD1</c>
+        <c>Sampled Streaming</c>
+      </texttable>
+      <t>This document requests registration of a URI in the "IETF XML Registry" <xref target="RFC3688">RFC 3688</xref>.  Following the format in RFC 3688, the following registration is suggested:</t>
+      <figure>
+        <artwork>
+          <![CDATA[
+URI: urn:ietf:params:xml:ns:yang:ietf-sampled-streaming
+Registrant Contact: The IESG.
+XML: N/A, the requested URI is an XML namespace.]]>
+        </artwork>
+      </figure>
+      <t>This document registers a YANG module in the "YANG Module Names" registry <xref target="RFC6020">RFC 6020</xref>:</t>
+      <figure>
+        <artwork>
+          <![CDATA[
+name: ietf-sampled-streaming
+namespace: urn:ietf:params:xml:ns:yang:ietf-sampled-streaming
+prefix: ss
+reference: This document]]>
+        </artwork>
+      </figure>
+    </section>
+    <section anchor="Security" title="Security Considerations">
+      <t>Vendors and deployments must take into consideration that this functionality allows a mirroring of traffic, with configurable destinations and filters.  Similar functionality already exists in various remote packet mirroring systems, and similar considerations should be taken.  Filters utilizing the source port of TBD1 SHOULD be applied at the edges of a provider's network to provide an additional layer of security.</t>
+      <t>A Replicator SHOULD ensure that Clients can only see their own entries in the 'samplers', and MUST ensure that once a Client has created an entry in the samplers list, only that same Client may re-query or make changes to it.</t>
+    </section>
+    <section anchor="Acknowledgements" title="Acknowledgments">
+      <t>The authors would like to thank Joe Clarke, Marek Hajduczenia, Brian Harber, Paolo Lucente, Jim Rampley, and Dmytro Shytyi for their reviews and providing helpful suggestions and feedback of this draft.</t>
+    </section>
+  </middle>
+
+
+  <back>
+    <references title="Normative References">
+      &RFC2119;
+      &RFC3688;
+      &RFC5476;
+      &RFC6020;
+      &RFC8343;
+      &RFC6728;
+    </references>
+    <references title="Informative References">
+      &PCAPNG;   
+    </references>
+    <section anchor="yang_tree" title="Yang Model Tree Reference">
+        <sourcecode src="ietf-sampled-streaming@2019-12-27.tree" />
+    </section>     
+    <section anchor="yang_model" title="Yang Model">
+        <sourcecode type="yang" src="ietf-sampled-streaming@2019-12-27.yang" />
+    </section>
+  </back>
+</rfc>
