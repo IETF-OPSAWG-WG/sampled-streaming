@@ -1,5 +1,5 @@
-VDRAFT=02
-VYANG=2019-10-22
+VDRAFT=03
+VYANG=2019-12-27
 
 dist: yang tree txt git
 
